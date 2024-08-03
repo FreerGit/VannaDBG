@@ -29,7 +29,10 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBURING REQUIRED liburing)
 pkg_check_modules(WOLFSSL REQUIRED wolfssl)
 
-add_executable(main main.c)
+include_directories(../ext/linenoise)
+
+add_executable(main main.c ../ext/linenoise/linenoise.c)
+
 target_include_directories(main PRIVATE 
     ${CMAKE_SOURCE_DIR}/include/stx/stx ${LIBURING_INCLUDE_DIRS} ${WOLFSSL_INCLUDE_DIRS})
 
