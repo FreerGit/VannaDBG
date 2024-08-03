@@ -1,51 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/personality.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
-#include "../ext/linenoise/linenoise.h"
-
-typedef struct {
-  char* prog_name;
-  int   pid;
-} debugger_t;
-
-char**
-split(char* str, char* delim, size_t* i) {
-  char** out   = malloc(256 * sizeof(char*));
-  char*  token = strtok(str, delim);
-  while (token != NULL) {
-    out[(*i)++] = token;
-    token       = strtok(NULL, delim);
-  }
-  return out;
-}
-
-void
-continue_execution(debugger_t* dbg) {
-  ptrace(PTRACE_CONT, dbg->pid, NULL, NULL);
-  int wait_status;
-  int options = 0;
-  waitpid(dbg->pid, &wait_status, options);
-}
-
-void
-handle_command(debugger_t* dbg, char* line) {
-  size_t size    = 0;
-  char** args    = split(line, " ", &size);
-  char*  command = args[0];
-
-  if (strcmp(command, "cont") == 0) {
-    continue_execution(dbg);
-  } else {
-    fprintf(stderr, "Unknown command: %s\n", command);
-  }
-
-  free(args);
-}
+#include "debugger.h"
 
 void
 execute_debugee(char* prog_name) {
@@ -54,19 +16,6 @@ execute_debugee(char* prog_name) {
     return;
   }
   execl(prog_name, prog_name, NULL);
-}
-
-void
-run(debugger_t* dbg) {
-  int wait_status;
-  int options = 0;
-
-  char* line = NULL;
-  while ((line = linenoise("VannaDBG> ")) != NULL) {
-    handle_command(dbg, line);
-    linenoiseHistoryAdd(line);
-    linenoiseFree(line);
-  }
 }
 
 int
@@ -80,10 +29,12 @@ main(int argc, char* argv[]) {
 
   int pid = fork();
   if (pid == 0) {
+    personality(ADDR_NO_RANDOMIZE);
     execute_debugee(prog);
   } else if (pid >= 1) {
-    printf("Started debugging process\n");
-    debugger_t dbg = {prog, pid};
-    run(&dbg);
+    printf("Started debugging process %d\n", pid);
+    debugger_t dbg = debugger(prog, pid);
+    debugger_run(&dbg);
+    debugger_free(&dbg);
   }
 }

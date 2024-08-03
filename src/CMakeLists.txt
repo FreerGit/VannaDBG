@@ -24,14 +24,12 @@ add_files_from_directory("${CMAKE_CURRENT_SOURCE_DIR}")
 
 # add_subdirectory(domain)
 
-# Find liburing and wolfssl, then link against them.
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBURING REQUIRED liburing)
-pkg_check_modules(WOLFSSL REQUIRED wolfssl)
-
+include_directories(../ext/hashmap)
 include_directories(../ext/linenoise)
+file(GLOB HASHMAP_SOURCES "../ext/hashmap/*.c")
+file(GLOB LINENOISE_SOURCES "../ext/linenoise/*.c")
 
-add_executable(main main.c ../ext/linenoise/linenoise.c)
+add_executable(main main.c ${HASHMAP_SOURCES} ${LINENOISE_SOURCES})
 
 target_include_directories(main PRIVATE 
     ${CMAKE_SOURCE_DIR}/include/stx/stx ${LIBURING_INCLUDE_DIRS} ${WOLFSSL_INCLUDE_DIRS})

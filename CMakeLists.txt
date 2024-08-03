@@ -3,7 +3,11 @@ project(VannaDBG)
 
 set(CMAKE_C_COMPILER gcc)
 set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_COMPILER gcc-13)
 set(CMAKE_C_STANDARD_REQUIRED True)
+
+# This will generate compile_commands.json, this allows clangd (IDE support) to interpret the project structure.
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1) 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
