@@ -164,8 +164,7 @@ handle_command(debugger_t* dbg, char* line) {
     continue_execution(dbg);
   } else if (str_eql(command, "break")) {
     // TODO
-    char* str_addr = args[1];
-    str_addr += 2;  // Assume 0xADDR....
+    char* str_addr = args[1] + 2;  // Assume 0xADDR....
     set_breakpoint_at_addr(dbg, addr_to_value(str_addr));
   } else if (str_eql(command, "register")) {
     if (str_eql(args[1], "dump")) {
