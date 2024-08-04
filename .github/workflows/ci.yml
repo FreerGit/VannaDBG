@@ -5,6 +5,7 @@ jobs:
   build-project:
     name: Build Project
     runs-on: ubuntu-latest
+    container: gcc:13
     steps:
       - uses: actions/checkout@v4
       - name: Build
