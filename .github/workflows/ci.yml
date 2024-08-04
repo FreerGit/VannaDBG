@@ -5,8 +5,14 @@ jobs:
   build-project:
     name: Build Project
     runs-on: ubuntu-latest
-    container: gcc-cmake:latest
+    container: gcc:13
     steps:
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+
+      - name: Use cmake
+        run: cmake --version
+      
       - uses: actions/checkout@v4
       - name: Build
         run: ./build.sh
