@@ -4,7 +4,7 @@
 #include <sys/ptrace.h>
 
 breakpoint_t
-breakpoint(int pid, char* addr) {
+breakpoint(int pid, intptr_t addr) {
   return (breakpoint_t){
       .pid        = pid,
       .addr       = addr,
@@ -37,7 +37,7 @@ breakpoint_is_enabled(breakpoint_t* brkpt) {
   return brkpt->enabled;
 }
 
-char*
+intptr_t
 breakpoint_get_address(breakpoint_t* brkpt) {
   return brkpt->addr;
 }

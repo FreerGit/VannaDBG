@@ -1,6 +1,7 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
+#include <stdint.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 

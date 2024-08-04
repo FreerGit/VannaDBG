@@ -5,14 +5,14 @@
 #include <sys/ptrace.h>
 
 typedef struct {
-  int     pid;
-  char*   addr;
-  bool    enabled;
-  uint8_t saved_data;
+  int      pid;
+  intptr_t addr;
+  bool     enabled;
+  uint8_t  saved_data;
 } breakpoint_t;
 
 breakpoint_t
-breakpoint(int pid, char* addr);
+breakpoint(int pid, intptr_t addr);
 
 void
 breakpoint_enable(breakpoint_t* brkpt);
@@ -23,7 +23,7 @@ breakpoint_disable(breakpoint_t* brkpt);
 bool
 breakpoint_is_enabled(breakpoint_t* brkpt);
 
-char*
+intptr_t
 breakpoint_get_address(breakpoint_t* brkpt);
 
 #endif  // BREAKPOINT_H

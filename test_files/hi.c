@@ -1,8 +1,7 @@
 #include <stdio.h>
 
-int main() {
-  printf("hi 1\n");
-  printf("hi 2\n");
-  printf("hi 3\n");
+int
+main() {
+  fprintf(stderr, "Hello world");
   return 0;
 }
