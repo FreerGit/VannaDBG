@@ -15,10 +15,10 @@ jobs:
 
       - name: Install OpenGL, glfw3 & libdwarf
         run:
-          sudo sapt-get update
-          sudo sapt-get install libglfw3-dev 
-          sudo sapt-get install libgl1-mesa-dev libglfw3-dev
-          sudo apt install libdwarf-dev
+          apt-get update
+          apt-get install libglfw3-dev 
+          apt-get install libgl1-mesa-dev libglfw3-dev
+          apt install libdwarf-dev
       
       - uses: actions/checkout@v4
       - name: Build
