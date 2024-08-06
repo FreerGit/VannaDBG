@@ -12,6 +12,11 @@ jobs:
 
       - name: Use cmake
         run: cmake --version
+
+      - name: Install OpenGL & glfw3
+        run: sudo apt-get update
+        run: sudo apt-get install libglfw3-dev
+        run: sudo apt-get install libgl1-mesa-dev libglfw3-dev
       
       - uses: actions/checkout@v4
       - name: Build
