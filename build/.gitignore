@@ -1,4 +1,0 @@
-# Ignores all files in this dir but keeps this file.
-# This is to enable a `empty` build folder to be commited.
-*
-!.gitignore

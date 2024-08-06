@@ -1,3 +1,7 @@
 a.out
 .cache
 .vscode
+
+build/*
+
+imgui.ini
