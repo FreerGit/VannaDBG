@@ -16,9 +16,9 @@ jobs:
       - name: Install OpenGL, glfw3 & libdwarf
         run: |
           apt-get update
-          apt-get install libglfw3-dev 
-          apt-get install libgl1-mesa-dev libglfw3-dev
-          apt install libdwarf-dev
+          apt-get install libglfw3-dev -y
+          apt-get install libgl1-mesa-dev libglfw3-dev -y
+          apt install libdwarf-dev -y
       
       - uses: actions/checkout@v4
       - name: Build
