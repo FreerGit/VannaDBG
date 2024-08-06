@@ -1,4 +1,5 @@
 
+
 #include "debugger.h"
 
 #include <errno.h>
@@ -86,13 +87,13 @@ addr_to_value(const char* addr) {
   return result;
 }
 
-void
-dump_registers(debugger_t* dbg) {
-  for (size_t i = 0; i < n_registers; i++) {
-    reg_description_t rd = reg_desc_array[i];
-    printf("%s 0x%016lx\n", rd.name, get_register_value(dbg->pid, rd.r));
-  }
-}
+// void
+// dump_registers(debugger_t* dbg) {
+//   for (size_t i = 0; i < n_registers; i++) {
+//     reg_description_t rd = reg_desc_array[i];
+//     printf("%s 0x%016lx\n", rd.name, get_register_value(dbg->pid, rd.r));
+//   }
+// }
 
 // You might want to add support for reading and writing more than a word at a
 // time, which you can do by incrementing the address each time you want to read
@@ -168,7 +169,7 @@ handle_command(debugger_t* dbg, char* line) {
     set_breakpoint_at_addr(dbg, addr_to_value(str_addr));
   } else if (str_eql(command, "register")) {
     if (str_eql(args[1], "dump")) {
-      dump_registers(dbg);
+      // dump_registers(dbg);
     } else if (str_eql(args[1], "read")) {
       printf("%ld\n",
              get_register_value(dbg->pid, get_register_from_name(args[2])));

@@ -5,7 +5,7 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
-#include "../ext/hashmap/hashmap.h"
+#include "hashmap.h"
 
 typedef struct {
   char*           prog_name;
