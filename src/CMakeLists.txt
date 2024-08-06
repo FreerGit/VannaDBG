@@ -20,11 +20,22 @@ set_target_properties(main PROPERTIES
 
 target_compile_definitions(main PUBLIC -DCIMGUI_USE_OPENGL3 -DCIMGUI_USE_GLFW)
 
+include(FetchContent)
+
+FetchContent_Declare(
+  libdwarf
+  GIT_REPOSITORY https://github.com/davea42/libdwarf-code.git
+  GIT_TAG b6140a57f20ce4b3680f10468aeeb0615d5ef296
+)
+
+FetchContent_MakeAvailable(libdwarf)
+
 target_include_directories(main PRIVATE
   ${CMAKE_SOURCE_DIR}/ext/cimgui
   ${CMAKE_SOURCE_DIR}/ext/cimgui/generator/output
   ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui
   ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui/backends
+  ${LIBDWARF_INCLUDE_DIRS}
 )
 
 target_link_libraries(main
@@ -33,4 +44,5 @@ target_link_libraries(main
   # ui
   glfw
   OpenGL::GL
+  dwarf
 )

@@ -13,11 +13,12 @@ jobs:
       - name: Use cmake
         run: cmake --version
 
-      - name: Install OpenGL & glfw3
+      - name: Install OpenGL, glfw3 & libdwarf
         run:
-          sudo apt-get update
-          sudo apt-get install libglfw3-dev
-          sudo apt-get install libgl1-mesa-dev libglfw3-dev
+          sudo sapt-get update
+          sudo sapt-get install libglfw3-dev 
+          sudo sapt-get install libgl1-mesa-dev libglfw3-dev
+          sudo apt install libdwarf-dev
       
       - uses: actions/checkout@v4
       - name: Build
