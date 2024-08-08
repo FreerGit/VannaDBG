@@ -3,8 +3,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 file(GLOB UI_SOURCES "*.c")
 
-# set gcc C23 for VannaDBG source. 
-set(CMAKE_C_COMPILER gcc)
+# set C23 for VannaDBG source. 
 set(CMAKE_C_STANDARD 23)
 
 include(FetchContent)
@@ -39,10 +38,6 @@ target_link_libraries(ui PRIVATE
 )
 
 target_include_directories(ui PUBLIC
-  # ${CMAKE_SOURCE_DIR}/src/domain
-  # ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/cimgui
-  # ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/cimgui/generator/output
   ${cimgui_SOURCE_DIR}/generator/output
   ${cimgui_SOURCE_DIR}/imgui/backends
-#   ${LIBDWARF_INCLUDE_DIRS}
 )

@@ -5,8 +5,7 @@ file(GLOB CORE_SOURCES "*.c")
 file(GLOB HASHMAP_SOURCES "${CMAKE_SOURCE_DIR}/ext/hashmap/*.c")
 file(GLOB LINENOISE_SOURCES "${CMAKE_SOURCE_DIR}/ext/linenoise/*.c")
 
-# set gcc C23 for VannaDBG source. 
-set(CMAKE_C_COMPILER gcc)
+# set C23 for VannaDBG source. 
 set(CMAKE_C_STANDARD 23)
 
 add_library(core STATIC ${CORE_SOURCES} ${HASHMAP_SOURCES} ${LINENOISE_SOURCES})
@@ -15,7 +14,4 @@ target_include_directories(core PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/hashmap
   ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/linenoise
-#   ${CMAKE_SOURCE_DIR}/ext/cimgui/generator/output
-#   ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui
-#   ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui/backends
 )

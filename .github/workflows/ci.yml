@@ -19,20 +19,16 @@ jobs:
     - name: OpenGL, GLFW3 & libdwarf
       run: |
         apt-get update -y
-        # sudo apt-get install -y software-properties-common
-        # sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        # sudo apt-get update -y
         apt-get install -y libglfw3-dev libgl1-mesa-dev
 
     - name: Install CMake
       run: apt-get install cmake -y
+    
+    - name: Verify version (Debugging)
+      run: |
+        gcc --version
+        cmake --version
 
     - name: Run build script
-      run: |
-        mkdir -p build
-        cd build/
-        # Comment out to get debug build, ASAN etc.
-        # cmake -D CMAKE_BUILD_TYPE=Debug -S ..
-        cmake -D CMAKE_BUILD_TYPE=Warn ..
-        cmake --build . -- -j$(nproc)
-        exit $?
+      run: 
+        ./build.sh
