@@ -1,7 +1,0 @@
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/cimgui.dir
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/edit_cache.dir
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/rebuild_cache.dir
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/list_install_components.dir
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/install.dir
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/install/local.dir
-/home/a7/dev/VannaDBG/ext/cimgui/CMakeFiles/install/strip.dir
