@@ -1,29 +1,34 @@
-name: Build
+name: CI
+
 on:
   push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  build-project:
-    name: Build Project
+  build:
     runs-on: ubuntu-latest
-    container: gcc:13
+
     steps:
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Use cmake
-        run: cmake --version
+    - name: Set up GCC 13
+      run: |
+        add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        apt-get update -y
+        apt-get install libglfw3-dev -y
+        apt-get install libgl1-mesa-dev libglfw3-dev -y
+        apt install libdwarf-dev -y
+        apt-get install gcc-13 g++-13 -y
+        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 60
+        update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 60
 
-      - name: Install OpenGL, glfw3 & libdwarf
-        run: |
-          apt-get update
-          apt-get install software-properties-common -y
-          add-apt-repository ppa:ubuntu-toolchain-r/test -y
-          apt-get update
-          apt-get install gcc-13 -y
-          apt-get install libglfw3-dev -y
-          apt-get install libgl1-mesa-dev libglfw3-dev -y
-          apt install libdwarf-dev -y
-      
-      - uses: actions/checkout@v4
-      - name: Build
-        run: ./build.sh
+    - name: Install CMake
+      run: apt-get install cmake -y
+
+    - name: Run build script
+      run: ./build.sh

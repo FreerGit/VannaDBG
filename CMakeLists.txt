@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 project(VannaDBG LANGUAGES C CXX)
 
 # This will generate compile_commands.json, this allows clangd (IDE support) to interpret the project structure.

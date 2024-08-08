@@ -34,7 +34,7 @@ target_include_directories(main PRIVATE
 )
 
 # set gcc C23 for VannaDBG source. 
-set(CMAKE_C_COMPILER /usr/bin/gcc-13)
+set(CMAKE_C_COMPILER gcc)
 set(CMAKE_C_STANDARD 23)
 
 target_link_libraries(main
