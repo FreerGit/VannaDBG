@@ -25,8 +25,8 @@ target_link_libraries(ui PRIVATE
 
 target_include_directories(ui PUBLIC
   # ${CMAKE_SOURCE_DIR}/src/domain
-  ${CMAKE_SOURCE_DIR}/ext/cimgui
-  ${CMAKE_SOURCE_DIR}/ext/cimgui/generator/output
-  ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui/backends
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/cimgui
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/cimgui/generator/output
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/cimgui/imgui/backends
 #   ${LIBDWARF_INCLUDE_DIRS}
 )

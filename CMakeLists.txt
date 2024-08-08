@@ -20,7 +20,7 @@ set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-point
 set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
 # Add cimgui
-add_subdirectory(${CMAKE_SOURCE_DIR}/ext/cimgui)
+add_subdirectory(ext/cimgui)
 
 # Add project
 add_subdirectory(src)
