@@ -1,15 +1,12 @@
 # This will generate compile_commands.json, this allows clangd (IDE support) to interpret the project structure.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
+set(CMAKE_C_STANDARD 23)
 
 add_subdirectory(core)
-# add_subdirectory(ui)
+add_subdirectory(ui)
+add_subdirectory(domain)
 
-find_package(OpenGL REQUIRED)
-
-add_executable(main
-  main.c
-  ../../ext/cimgui/imgui/backends/imgui_impl_glfw.cpp
-  ../../ext/cimgui/imgui/backends/imgui_impl_opengl3.cpp
+add_executable(main main.c
 )
 
 # cimgui compiles cpp code.
@@ -17,8 +14,6 @@ set_target_properties(main PROPERTIES
   CXX_STANDARD 11
   CXX_STANDARD_REQUIRED ON
 )
-
-target_compile_definitions(main PUBLIC -DCIMGUI_USE_OPENGL3 -DCIMGUI_USE_GLFW)
 
 include(FetchContent)
 
@@ -28,21 +23,22 @@ FetchContent_Declare(
   GIT_TAG b6140a57f20ce4b3680f10468aeeb0615d5ef296
 )
 
+# Only build static lib, not the objdump binary.
+set(BUILD_DWARFDUMP OFF CACHE BOOL "" FORCE)
+set(BUILD_NON_SHARED OFF CACHE BOOL "" FORCE)
+
 FetchContent_MakeAvailable(libdwarf)
 
 target_include_directories(main PRIVATE
-  ${CMAKE_SOURCE_DIR}/ext/cimgui
-  ${CMAKE_SOURCE_DIR}/ext/cimgui/generator/output
-  ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui
-  ${CMAKE_SOURCE_DIR}/ext/cimgui/imgui/backends
   ${LIBDWARF_INCLUDE_DIRS}
 )
 
+# set gcc C23 for VannaDBG source. 
+set(CMAKE_C_COMPILER /usr/bin/gcc-13)
+set(CMAKE_C_STANDARD 23)
+
 target_link_libraries(main
-  cimgui
   core
-  # ui
-  glfw
-  OpenGL::GL
+  ui
   dwarf
 )
