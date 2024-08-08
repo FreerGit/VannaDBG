@@ -1,4 +1,4 @@
 .#!/bin/bash
 ./bin/act
 
-docker system prune -y -a --volumes
+docker system prune -a --volumes -f
