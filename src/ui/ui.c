@@ -1,6 +1,5 @@
 #include "ui.h"
 
-#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 

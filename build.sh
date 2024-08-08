@@ -7,5 +7,5 @@ cd build/
 # Comment out to get debug build, ASAN etc.
 # cmake -D CMAKE_BUILD_TYPE=Debug -S ..
 cmake -D CMAKE_BUILD_TYPE=Warn ..
-make
+cmake --build . -- -j$(nproc)
 exit $?
