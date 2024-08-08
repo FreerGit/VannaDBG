@@ -16,6 +16,9 @@ jobs:
       - name: Install OpenGL, glfw3 & libdwarf
         run: |
           apt-get update
+          apt-get install software-properties-common -y
+          add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          apt-get update
           apt-get install gcc-13 -y
           apt-get install libglfw3-dev -y
           apt-get install libgl1-mesa-dev libglfw3-dev -y
