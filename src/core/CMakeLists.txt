@@ -6,7 +6,7 @@ file(GLOB HASHMAP_SOURCES "${CMAKE_SOURCE_DIR}/ext/hashmap/*.c")
 file(GLOB LINENOISE_SOURCES "${CMAKE_SOURCE_DIR}/ext/linenoise/*.c")
 
 # set gcc C23 for VannaDBG source. 
-set(CMAKE_C_COMPILER /usr/bin/gcc-13)
+set(CMAKE_C_COMPILER gcc)
 set(CMAKE_C_STANDARD 23)
 
 add_library(core STATIC ${CORE_SOURCES} ${HASHMAP_SOURCES} ${LINENOISE_SOURCES})

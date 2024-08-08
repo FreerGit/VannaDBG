@@ -11,24 +11,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    container: gcc:13
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up GCC 13
+    - name: OpenGL, GLFW3 & libdwarf
       run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
         apt-get update -y
-        apt-get install libglfw3-dev -y
-        apt-get install libgl1-mesa-dev libglfw3-dev -y
-        apt install libdwarf-dev -y
-        apt-get install gcc-13 g++-13 -y
-        update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 60
-        update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 60
+        # sudo apt-get install -y software-properties-common
+        # sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        # sudo apt-get update -y
+        apt-get install -y libglfw3-dev libgl1-mesa-dev
 
     - name: Install CMake
       run: apt-get install cmake -y
 
     - name: Run build script
-      run: ./build.sh
+      run: |
+        mkdir -p build
+        cd build/
+        # Comment out to get debug build, ASAN etc.
+        # cmake -D CMAKE_BUILD_TYPE=Debug -S ..
+        cmake -D CMAKE_BUILD_TYPE=Warn ..
+        cmake --build . -- -j$(nproc)
+        exit $?

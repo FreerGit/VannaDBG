@@ -4,8 +4,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 file(GLOB UI_SOURCES "*.c")
 
 # set gcc C23 for VannaDBG source. 
-# set(CMAKE_C_COMPILER /usr/bin/gcc-13)
-# set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_C_STANDARD 23)
 
 include(FetchContent)
 
