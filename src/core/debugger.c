@@ -196,12 +196,12 @@ handle_command(debugger_t* dbg, char* line) {
 void
 debugger_run(debugger_t* dbg) {
   wait_for_signal(dbg);
-  char* line = NULL;
-  while ((line = linenoise("VannaDBG> ")) != nullptr) {
-    handle_command(dbg, line);
-    linenoiseHistoryAdd(line);
-    linenoiseFree(line);
-  }
+  // char* line = NULL;
+  // while ((line = linenoise("VannaDBG> ")) != nullptr) {
+  //   handle_command(dbg, line);
+  //   linenoiseHistoryAdd(line);
+  //   linenoiseFree(line);
+  // }
 }
 
 void

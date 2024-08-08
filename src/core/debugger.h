@@ -22,4 +22,7 @@ debugger_run(debugger_t* dbg);
 void
 debugger_free(debugger_t* dbg);
 
+void
+continue_execution(debugger_t* dbg);
+
 #endif  // DEBUGGER_H

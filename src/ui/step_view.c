@@ -6,9 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ui.h"
+
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include "cimgui.h"
-// #include "cimgui_impl.h"
 
 SLICE_IMPLEMENTATION(step_line_t);
 
@@ -44,10 +45,10 @@ step_view_load() {
 void
 step_view_key_callback(GLFWwindow *window, int key, int scancode, int action,
                        int mods) {
-  (void)scancode;
+  (void)scancode, (void)mods;
   if (key == GLFW_KEY_SPACE &&
       (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    step_view_t *view   = glfwGetWindowUserPointer(window);
+    step_view_t *view = &((ui_t *)glfwGetWindowUserPointer(window))->step_view;
     view->curr_stepline = (view->curr_stepline + 1) % view->source_lines.length;
   }
 }
@@ -76,26 +77,8 @@ step_view_render(step_view_t *view) {
         ImDrawList_AddRectFilled(draw_list, rect_min, rect_max,
                                  igGetColorU32_Vec4(color), 0.0f, 0);
       }
-      igText("new: %s", text);
+      igText("%d: %s", step_line_t_slice_index(&step_line, i).source_num, text);
     }
     igEnd();
-
-    // for (size_t i = 0; i < line_count; i++) {
-    //   // const char *text = lines[i]->source_line;
-    //   if (lines[i].highlighted) {
-    //     // Define the rectangle dimensions
-    //     // Top-left corner of the rectangle (same
-    //     // as text position)
-
-    //     // Full width of window and 50px height
-
-    //     // Set the color (RGBA)
-    //     // Red color with full opacity
-
-    //     // Draw the filled rectangle behind the text
-
-    //   }
-    //   // Draw the text (on top of the rectangle)
-    // }
   }
 }

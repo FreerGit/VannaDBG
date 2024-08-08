@@ -39,6 +39,7 @@ set(CMAKE_C_STANDARD 23)
 
 target_link_libraries(main
   core
+  domain
   ui
   dwarf
 )

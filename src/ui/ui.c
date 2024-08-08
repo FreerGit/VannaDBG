@@ -2,8 +2,10 @@
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <unistd.h>
 
 #include "debugger.h"
+#include "register_view.h"
 #include "registers.h"
 #include "step_view.h"
 
@@ -28,24 +30,7 @@ handle_key_callbacks(GLFWwindow *window, int key, int scancode, int action,
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
   step_view_key_callback(window, key, scancode, action, mods);
-}
-
-void
-execute_debugee(char *prog_name) {
-  if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0) {
-    printf("Error in ptrace\n");
-    return;
-  }
-  execl(prog_name, prog_name, NULL);
-}
-
-void
-dump_registers(debugger_t *dbg) {
-  for (size_t i = 0; i < n_registers; i++) {
-    reg_description_t rd = reg_desc_array[i];
-    // printf("%s 0x%016lx\n", rd.name, get_register_value(dbg->pid, rd.r));
-    igText("%s 0x%016lx\n", rd.name, get_register_value(dbg->pid, rd.r));
-  }
+  register_view_key_callback(window, key, scancode, action, mods);
 }
 
 // void
@@ -120,7 +105,10 @@ start_ui(debugger_t *dbg) {
   clearColor.z = 0.60f;
   clearColor.w = 1.00f;
 
-  step_view_t step_view = step_view_load();
+  step_view_t     step_view     = step_view_load();
+  register_view_t register_view = register_view_load();
+  ui_t            ui_context    = (ui_t){dbg, step_view, register_view};
+
   // create lines and set mimic stepping (set first)
   // lines[0].highlighted = true;
 
@@ -129,7 +117,7 @@ start_ui(debugger_t *dbg) {
   // free(source_lines[i]);  // Free each line after printing
   // free(source_lines);  // Free the array of pointers
 
-  glfwSetWindowUserPointer(window, &step_view);
+  glfwSetWindowUserPointer(window, &ui_context);
   glfwSetKeyCallback(window, handle_key_callbacks);
 
   // step_view_init(window);
@@ -143,16 +131,9 @@ start_ui(debugger_t *dbg) {
     igNewFrame();
 
     // show a simple window that we created ourselves.
-    {
-      igBegin("Register dump", NULL, 0);
-      dump_registers(dbg);
-      igText("%.3f ms/frame (%.1f FPS)", 1000.0f / igGetIO()->Framerate,
-             igGetIO()->Framerate);
-      igEnd();
-    }
-
+    register_view_render(&ui_context.register_view, ui_context.dbg);
     // File display window
-    step_view_render(&step_view);
+    step_view_render(&ui_context.step_view);
 
     // render
     igRender();

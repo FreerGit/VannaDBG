@@ -16,6 +16,7 @@ jobs:
       - name: Install OpenGL, glfw3 & libdwarf
         run: |
           apt-get update
+          apt-get install gcc-13 -y
           apt-get install libglfw3-dev -y
           apt-get install libgl1-mesa-dev libglfw3-dev -y
           apt install libdwarf-dev -y

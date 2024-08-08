@@ -11,6 +11,15 @@
 #include "core/debugger.h"
 #include "ui/ui.h"
 
+void
+execute_debugee(char *prog_name) {
+  if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0) {
+    printf("Error in ptrace\n");
+    return;
+  }
+  execl(prog_name, prog_name, NULL);
+}
+
 int
 main() {
   int pid = fork();
@@ -20,7 +29,7 @@ main() {
   } else if (pid >= 1) {
     printf("Started debugging process %d\n", pid);
     debugger_t dbg = debugger("./test_files/a.out", pid);
-    // debugger_run(&dbg);
+    debugger_run(&dbg);
     // debugger_free(&dbg);
 
     int res = start_ui(&dbg);
