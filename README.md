@@ -1,6 +1,10 @@
 # VannaDBG
 Vanna Volma Charm Banana
 
+[![CI](https://github.com/freergit/VannaDBG/actions/workflows/ci.yml/badge.svg)][gh-ci]
+
+[gh-ci]: https://github.com/freergit/evm-rs/actions/workflows/ci.yml
+
 # Notes
 deal w/ inlining
 

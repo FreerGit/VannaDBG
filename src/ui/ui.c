@@ -33,26 +33,6 @@ handle_key_callbacks(GLFWwindow *window, int key, int scancode, int action,
   register_view_key_callback(window, key, scancode, action, mods);
 }
 
-// void
-// check_error(Dwarf_Error error, const char *msg) {
-//   if (error != NULL) {
-//     fprintf(stderr, "Error: %s (%s)\n", msg, dwarf_errmsg(error));
-//     exit(1);
-//   }
-// }
-
-// void
-// print_cu_name(Dwarf_Debug dbg, Dwarf_Die cu_die) {
-//   char       *name;
-//   Dwarf_Error error = NULL;
-//   if (dwarf_diename(cu_die, &name, &error) == DW_DLV_OK) {
-//     printf("CU Name: %s\n", name);
-//     dwarf_dealloc(dbg, name, DW_DLA_STRING);
-//   } else {
-//     printf("CU Name: <unknown>\n");
-//   }
-// }
-
 int
 start_ui(debugger_t *dbg) {
   if (!glfwInit()) return -1;
