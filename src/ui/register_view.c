@@ -22,7 +22,7 @@ register_view_key_callback(GLFWwindow *window, int key, int scancode,
       (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     ui_t *ui = glfwGetWindowUserPointer(window);
 
-    continue_execution(ui->dbg);
+    // continue_execution(ui->dbg);
   }
 }
 

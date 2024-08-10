@@ -1,12 +1,6 @@
 # This will generate compile_commands.json, this allows clangd (IDE support) to interpret the project structure.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
 
-add_subdirectory(core)
-add_subdirectory(ui)
-add_subdirectory(domain)
-
-add_executable(main main.c)
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -21,8 +15,21 @@ set(BUILD_NON_SHARED OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libdwarf)
 
+set(LIBDWARF_INCLUDE_DIRS ${libdwarf_SOURCE_DIR}/libdwarf ${libdwarf_BINARY_DIR}/libdwarf)
+set(LIBDWARF_LIBS dwarf) 
+
+include_directories(${LIBDWARF_INCLUDE_DIRS})
+link_libraries(${LIBDWARF_LIBS})
+
+add_subdirectory(core)
+add_subdirectory(ui)
+add_subdirectory(domain)
+
+add_executable(main main.c)
+
+
 target_include_directories(main PRIVATE
-  ${LIBDWARF_INCLUDE_DIRS}
+  # ${LIBDWARF_INCLUDE_DIRS}
 )
 
 # set C23 for VannaDBG source. 
@@ -32,5 +39,5 @@ target_link_libraries(main
   core
   domain
   ui
-  dwarf
+  # dwarf
 )
