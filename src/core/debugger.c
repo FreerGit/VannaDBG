@@ -13,7 +13,6 @@
 
 #include "breakpoint.h"
 #include "hashmap.h"
-#include "libdwarf.h"
 #include "registers.h"
 
 typedef struct {
@@ -44,10 +43,11 @@ debugger(char* prog_name, int pid) {
   struct hashmap* map =
       hashmap_new(sizeof(breakpoint_addr), 1024, 0, 0, breakpoint_addr_hash,
                   breakpoint_addr_compare, NULL, NULL);
-  return (debugger_t){.prog_name   = prog_name,
-                      .pid         = pid,
-                      .breakpoints = map,
-                      .dwarf       = (Dwarf_Debug){}};
+  return (debugger_t){
+      .prog_name   = prog_name,
+      .pid         = pid,
+      .breakpoints = map,
+  };
 }
 
 // char**

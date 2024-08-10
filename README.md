@@ -14,6 +14,9 @@ Install glfw3 & opengl3:
 
 sudo apt-get update
 
-sudo apt-get install libglfw3-dev
+sudo apt-get install elfutils libdw-dev
 
 sudo apt-get install libgl1-mesa-dev libglfw3-dev
+
+# Assortment of todos that I will force myself to do eventually frfr
+Remove the abomination that is CMake in favor of conan or something that makes sense.

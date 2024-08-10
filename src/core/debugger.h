@@ -6,13 +6,11 @@
 #include <sys/wait.h>
 
 #include "hashmap.h"
-#include "libdwarf.h"
 
 typedef struct {
   char*           prog_name;
   int             pid;
   struct hashmap* breakpoints;
-  Dwarf_Debug     dwarf;
 } debugger_t;
 
 debugger_t

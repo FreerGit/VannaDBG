@@ -11,7 +11,6 @@ set(CMAKE_C_STANDARD 23)
 add_library(core STATIC ${CORE_SOURCES} ${HASHMAP_SOURCES} ${LINENOISE_SOURCES})
 
 target_include_directories(core PUBLIC
-  ${LIBDWARF_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/hashmap
   ${CMAKE_CURRENT_SOURCE_DIR}/../../ext/linenoise
