@@ -13,9 +13,14 @@
     return (type##_slice){slice->ptr + start, end - start};               \
   }                                                                       \
                                                                           \
-  type type##_slice_index(type##_slice* slice, uint32_t index) {          \
+  type type##_slice_value(type##_slice* slice, uint32_t index) {          \
     assert(index < slice->length && "index out of bounds");               \
     return slice->ptr[index];                                             \
+  }                                                                       \
+                                                                          \
+  type* type##_slice_ref(type##_slice* slice, uint32_t index) {           \
+    assert(index < slice->length && "index out of bounds");               \
+    return &(slice->ptr[index]);                                          \
   }
 
 /**
@@ -29,6 +34,7 @@
                                                                           \
   type##_slice type##_slice_subslice(type##_slice* slice, uint32_t start, \
                                      uint32_t end);                       \
-  type         type##_slice_index(type##_slice* slice, uint32_t index);
+  type         type##_slice_value(type##_slice* slice, uint32_t index);   \
+  type*        type##_slice_ref(type##_slice* slice, uint32_t index);
 
 #endif  // SLICE_H

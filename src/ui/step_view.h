@@ -9,6 +9,7 @@
 typedef struct {
   char* source_line;
   int   source_num;
+  bool  breakpoint_enabled;
 } step_line_t;
 
 SLICE_DEFINITION(step_line_t);

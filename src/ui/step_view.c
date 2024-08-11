@@ -87,10 +87,11 @@ step_view_render(step_view_t *view) {
     igGetWindowSize(&window_size);
 
     igBegin("test_files/funcs.c", NULL, 0);
-    step_line_t_slice step_line = view->source_lines;
-    for (size_t i = 0; i < step_line.length; i++) {
-      ImDrawList *draw_list = igGetWindowDrawList();
-      const char *text = step_line_t_slice_index(&step_line, i).source_line;
+    step_line_t_slice step_lines = view->source_lines;
+
+    for (size_t i = 0; i < step_lines.length; i++) {
+      ImDrawList  *draw_list = igGetWindowDrawList();
+      step_line_t *line      = step_line_t_slice_ref(&step_lines, i);
 
       ImVec2 cursor_pos;
       igGetCursorScreenPos(&cursor_pos);  // Get current cursor position
@@ -102,11 +103,22 @@ step_view_render(step_view_t *view) {
 
       // Check if the rectangle is hovered
       bool is_hovered = igIsMouseHoveringRect(rect_min, rect_max, true);
+      if (igIsItemClicked(0) && is_hovered) {
+        line->breakpoint_enabled = true;
+      }
 
       // Draw the rectangle with hover effect
-      ImU32 rect_color =
-          is_hovered ? igGetColorU32_Vec4((ImVec4){1.0f, 0.0f, 0.0f, 1.0f})
-                     : igGetColorU32_Vec4((ImVec4){0.6f, 0.6f, 0.6f, 1.0f});
+      ImU32 rect_color;
+      if (line->breakpoint_enabled) {
+        rect_color = igGetColorU32_Vec4(
+            (ImVec4){0.0f, 1.0f, 0.0f, 1.0f});  // Green when clicked
+      } else if (is_hovered) {
+        rect_color = igGetColorU32_Vec4(
+            (ImVec4){1.0f, 0.0f, 0.0f, 1.0f});  // Red when hovered
+      } else {
+        rect_color = igGetColorU32_Vec4(
+            (ImVec4){0.6f, 0.6f, 0.6f, 1.0f});  // Gray when idle
+      }
       ImDrawList_AddRectFilled(draw_list, rect_min, rect_max, rect_color, 0.0f,
                                0);
 
@@ -115,7 +127,7 @@ step_view_render(step_view_t *view) {
           rect_max.x + 5, cursor_pos.y});  // Adding a small padding of 5 pixels
 
       // Draw the text
-      igText("%d: %s", step_line_t_slice_index(&step_line, i).source_num, text);
+      igText("%d: %s", line->source_num, line->source_line);
 
       // Submit a dummy item to validate the new extent
       igDummy((ImVec2){window_size.x, igGetTextLineHeightWithSpacing()});
