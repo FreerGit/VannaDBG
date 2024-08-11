@@ -19,4 +19,6 @@ sudo apt-get install elfutils libdw-dev
 sudo apt-get install libgl1-mesa-dev libglfw3-dev
 
 # Assortment of todos that I will force myself to do eventually frfr
-Remove the abomination that is CMake in favor of conan or something that makes sense.
+Remove CMake and just use amalgamated build....
+File window
+keybindings

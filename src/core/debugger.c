@@ -3,16 +3,17 @@
 #include "debugger.h"
 
 #include <errno.h>
-#include <linenoise.h>
+#include <gelf.h>
+#include <libelf.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "breakpoint.h"
-#include "hashmap.h"
 #include "registers.h"
 
 typedef struct {
@@ -20,34 +21,108 @@ typedef struct {
   breakpoint_t bp;
 } breakpoint_addr;
 
-int
-breakpoint_addr_compare(const void* a, const void* b, void* udata) {
-  (void)(udata);
-  printf("hUH\n");
-  const breakpoint_addr* aptr = a;
-  const breakpoint_addr* bptr = b;
-  printf("comparing: %d \n", aptr->addr == bptr->addr);
-  return !(aptr->addr == bptr->addr);  // The library expects something like
-                                       // strcmp i.e returns 0 on equal.
+uintptr_t
+find_main_address(pid_t pid) {
+  char proc_exe[64];
+  snprintf(proc_exe, sizeof(proc_exe), "/proc/%d/exe", pid);
+
+  FILE* fp = fopen(proc_exe, "r");
+  int   fd = fileno(fp);
+  if (fd < 0) {
+    perror("Failed to open executable");
+    return 0;
+  }
+
+  if (elf_version(EV_CURRENT) == EV_NONE) {
+    fprintf(stderr, "ELF library initialization failed\n");
+    close(fd);
+    return 0;
+  }
+
+  Elf* elf = elf_begin(fd, ELF_C_READ, NULL);
+  if (!elf) {
+    fprintf(stderr, "elf_begin() failed\n");
+    close(fd);
+    return 0;
+  }
+
+  GElf_Ehdr ehdr;
+  if (gelf_getehdr(elf, &ehdr) == NULL) {
+    fprintf(stderr, "gelf_getehdr() failed\n");
+    elf_end(elf);
+    close(fd);
+    return 0;
+  }
+
+  Elf_Scn*  scn = NULL;
+  GElf_Shdr shdr;
+  Elf_Data* data;
+  int       symbol_count;
+
+  while ((scn = elf_nextscn(elf, scn)) != NULL) {
+    gelf_getshdr(scn, &shdr);
+    if (shdr.sh_type == SHT_SYMTAB) {
+      data         = elf_getdata(scn, NULL);
+      symbol_count = shdr.sh_size / shdr.sh_entsize;
+
+      for (int i = 0; i < symbol_count; i++) {
+        GElf_Sym sym;
+        gelf_getsym(data, i, &sym);
+
+        char* name = elf_strptr(elf, shdr.sh_link, sym.st_name);
+        if (name && strcmp(name, "main") == 0) {
+          elf_end(elf);
+          close(fd);
+          return (uintptr_t)sym.st_value + get_base_address(pid);
+        }
+      }
+    }
+  }
+
+  elf_end(elf);
+  close(fd);
+  return 0;
 }
 
-uint64_t
-breakpoint_addr_hash(const void* item, uint64_t seed0, uint64_t seed1) {
-  const breakpoint_addr* bpaddr = item;
-  printf("hashing: %d\n", bpaddr->bp.pid);
-  return hashmap_sip(&bpaddr->addr, 1, seed0, seed1);
+uintptr_t
+get_base_address(pid_t pid) {
+  char filename[64];
+  snprintf(filename, sizeof(filename), "/proc/%d/maps", pid);
+
+  FILE* fp = fopen(filename, "r");
+  if (fp == NULL) {
+    perror("Failed to open maps file");
+    return 0;
+  }
+
+  char      line[256];
+  uintptr_t base_addr = 0;
+
+  while (fgets(line, sizeof(line), fp)) {
+    unsigned long start, end;
+    // Parse the line
+    int matched = sscanf(line, "%lx-%lx", &start, &end);
+
+    // Look for the executable segment
+    if (matched == 2) {
+      base_addr = start;
+      break;
+    }
+  }
+
+  fclose(fp);
+  return base_addr;
 }
 
 debugger_t
 debugger(char* prog_name, int pid) {
-  struct hashmap* map =
-      hashmap_new(sizeof(breakpoint_addr), 1024, 0, 0, breakpoint_addr_hash,
-                  breakpoint_addr_compare, NULL, NULL);
-  return (debugger_t){
+  debugger_t dbg = (debugger_t){
       .prog_name   = prog_name,
       .pid         = pid,
-      .breakpoints = map,
+      .breakpoints = {},
   };
+
+  return dbg;
 }
 
 // char**
@@ -104,14 +179,14 @@ debugger(char* prog_name, int pid) {
 // another word. You could also use process_vm_readv and process_vm_writev or
 // /proc/<pid>/mem instead of ptrace if you like.
 
-uint64_t
+long
 read_memory(debugger_t* dbg, uint64_t addr) {
-  // return (uint64_t)ptrace(PTRACE_PEEKDATA, dbg->pid, addr, nullptr);
+  return ptrace(PTRACE_PEEKDATA, dbg->pid, addr, nullptr);
 }
 
-void
+long
 write_memory(debugger_t* dbg, uint64_t addr, uint64_t value) {
-  // ptrace(PTRACE_POKEDATA, dbg->pid, addr, value);
+  ptrace(PTRACE_POKEDATA, dbg->pid, addr, value);
 }
 
 uint64_t

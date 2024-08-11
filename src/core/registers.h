@@ -3,12 +3,9 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <string.h>
 #include <sys/ptrace.h>
 #include <sys/user.h>
 #include <sys/wait.h>
-
-#include "hashmap.h"
 
 typedef enum {
   rax,

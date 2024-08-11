@@ -1,5 +1,8 @@
 #include "registers.h"
 
+#include <stddef.h>
+#include <string.h>
+
 uint64_t
 get_register_value(pid_t pid, reg_t r) {
   struct user_regs_struct regs;

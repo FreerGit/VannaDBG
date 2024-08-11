@@ -11,10 +11,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: gcc:13
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Clang
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 19
 
     - name: OpenGL, GLFW3 & elfutils (libdw)
       run: |
@@ -26,7 +31,7 @@ jobs:
     
     - name: Verify version (Debugging)
       run: |
-        gcc --version
+        clang-19 --version
         cmake --version
 
     - name: Run build script

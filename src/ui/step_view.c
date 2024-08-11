@@ -116,86 +116,11 @@ step_view_key_callback(GLFWwindow *window, int key, int scancode, int action,
 
   if (key == GLFW_KEY_SPACE &&
       (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    struct user_regs_struct regs;
-
-    unsigned long long base_addr = 0x555555554000;
-    unsigned long long main_addr = 0x555555555189;
-    // find_main_address(ui->dbg->dwarf, base_addr);
-    printf("main: %llx\n", main_addr);
-
-    long data = ptrace(PTRACE_PEEKTEXT, pid, (void *)main_addr, NULL);
-    if ((data & 0xFF) != 0xCC) {
-      printf("Breakpoint not set correctly at 0x%llx\n", main_addr);
-      return;
-    }
-
-    printf("base addr: %llx\nmain addr: %llx\n", base_addr, main_addr);
-    if (main_addr == 0) {
-      fprintf(stderr, "Failed to find main function\n");
-      return;
-    }
-
     // Continue execution
     if (ptrace(PTRACE_CONT, pid, NULL, NULL) == -1) {
       perror("ptrace(PTRACE_CONT)");
       return;
     }
-
-    // Wait for the child to stop
-    int status;
-    if (waitpid(pid, &status, 0) == -1) {
-      perror("waitpid");
-      return;
-    }
-
-    if (WIFEXITED(status)) {
-      printf("Child exited\n");
-      return;
-    }
-
-    if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP) {
-      printf("fdsa\n");
-      // Get the current registers
-      if (ptrace(PTRACE_GETREGS, pid, NULL, &regs) == -1) {
-        perror("ptrace(PTRACE_GETREGS)");
-        return;
-      }
-      // Confirm we're at main
-      if (regs.rip - 1 == main_addr) {  // -1 because rip will be after the
-                                        // breakpoint instruction
-        printf("Reached main function at address: 0x%llx\n",
-               (unsigned long long)main_addr);
-        printf("Current instruction pointer: 0x%llx\n",
-               (unsigned long long)regs.rip);
-      } else {
-        printf("Stopped, but not at main. Current address: 0x%llx\n",
-               (unsigned long long)regs.rip);
-      }
-    }
-
-    // long orig_data = (data & 0xFFFFFFFFFFFFFF00) | (data & 0xFF);
-    // if (ptrace(PTRACE_POKETEXT, pid, (void *)main_addr, (void *)orig_data) ==
-    //     -1) {
-    //   perror("ptrace(PTRACE_POKETEXT) to restore original instruction");
-    //   return;
-    // }
-
-    // // Adjust RIP and continue
-    // regs.rip = main_addr;
-    // if (ptrace(PTRACE_SETREGS, pid, NULL, &regs) == -1) {
-    //   perror("ptrace(PTRACE_SETREGS)");
-    //   return;
-    // }
-
-    // Call the function that maps the address to a source line
-    // if (get_line_from_pc(ui->dbg->dwarf, relative_pc, &filename,
-    //                      &line_number) == DW_DLV_OK) {
-    //   printf("Source file: %s\n", filename);
-    //   printf("Line number: %llu\n", line_number);
-    // } else {
-    //   printf("No matching line found for PC: %llx\n",
-    //          (unsigned long long)relative_pc);
-    // }
 
     // step_view_t *view = &((ui_t
     // *)glfwGetWindowUserPointer(window))->step_view; view->curr_stepline =

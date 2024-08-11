@@ -7,21 +7,20 @@
 typedef struct {
   int      pid;
   intptr_t addr;
-  bool     enabled;
-  uint8_t  saved_data;
+  bool     x;
 } breakpoint_t;
 
 breakpoint_t
 breakpoint(int pid, intptr_t addr);
 
-void
-breakpoint_enable(breakpoint_t* brkpt);
+breakpoint_t
+breakpoint_create(int pid, char* name);
 
 void
 breakpoint_disable(breakpoint_t* brkpt);
 
-bool
-breakpoint_is_enabled(breakpoint_t* brkpt);
+// bool
+// breakpoint_is_enabled(breakpoint_t* brkpt);
 
 intptr_t
 breakpoint_get_address(breakpoint_t* brkpt);
