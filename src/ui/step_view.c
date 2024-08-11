@@ -74,6 +74,12 @@ step_view_key_callback(GLFWwindow *window, int key, int scancode, int action,
   }
 }
 
+ImU32
+color_vec4(int r, int g, int b, int a) {
+  ImVec4 color = {r, g, b, a};
+  return igGetColorU32_Vec4(color);
+}
+
 void
 step_view_render(step_view_t *view) {
   {
@@ -83,28 +89,39 @@ step_view_render(step_view_t *view) {
     igBegin("test_files/funcs.c", NULL, 0);
     step_line_t_slice step_line = view->source_lines;
     for (size_t i = 0; i < step_line.length; i++) {
-      const char *text = step_line_t_slice_index(&step_line, i).source_line;
       ImDrawList *draw_list = igGetWindowDrawList();
-      if (view->curr_stepline == i) {
-        ImVec2 text_pos, text_size;
-        igGetCursorScreenPos(&text_pos);
-        igCalcTextSize(&text_size, text, NULL, false, -1.0f);
-        ImVec2 rect_min = text_pos;
-        ImVec2 rect_max = {text_pos.x + window_size.x,
-                           text_pos.y + text_size.y};
-        ImVec4 color    = {255, 0, 0, 255};
-        ImDrawList_AddRectFilled(draw_list, rect_min, rect_max,
-                                 igGetColorU32_Vec4(color), 0.0f, 0);
-      }
-      ImVec2 text_pos, text_size;
-      igGetCursorScreenPos(&text_pos);
-      igCalcTextSize(&text_size, text, NULL, false, -1.0f);
-      ImVec2 rect_min = text_pos;
-      ImVec2 rect_max = {text_pos.x + 50, text_pos.y + text_size.y};
-      ImVec4 color    = {255, 0, 0, 255};
-      ImDrawList_AddRect(draw_list, rect_min, rect_max,
-                         igGetColorU32_Vec4(color), 0.0f, 0, 0);
+      const char *text = step_line_t_slice_index(&step_line, i).source_line;
+
+      ImVec2 cursor_pos;
+      igGetCursorScreenPos(&cursor_pos);  // Get current cursor position
+
+      // Define rectangle area
+      ImVec2 rect_min = cursor_pos;
+      ImVec2 rect_max = {cursor_pos.x + 50,
+                         cursor_pos.y + igGetTextLineHeight()};
+
+      // Check if the rectangle is hovered
+      bool is_hovered = igIsMouseHoveringRect(rect_min, rect_max, true);
+
+      // Draw the rectangle with hover effect
+      ImU32 rect_color =
+          is_hovered ? igGetColorU32_Vec4((ImVec4){1.0f, 0.0f, 0.0f, 1.0f})
+                     : igGetColorU32_Vec4((ImVec4){0.6f, 0.6f, 0.6f, 1.0f});
+      ImDrawList_AddRectFilled(draw_list, rect_min, rect_max, rect_color, 0.0f,
+                               0);
+
+      // Move cursor to the right of the rectangle for text
+      igSetCursorScreenPos((ImVec2){
+          rect_max.x + 5, cursor_pos.y});  // Adding a small padding of 5 pixels
+
+      // Draw the text
       igText("%d: %s", step_line_t_slice_index(&step_line, i).source_num, text);
+
+      // Submit a dummy item to validate the new extent
+      igDummy((ImVec2){window_size.x, igGetTextLineHeightWithSpacing()});
+      // Move cursor to the next line
+      igSetCursorScreenPos((ImVec2){
+          cursor_pos.x, cursor_pos.y + igGetTextLineHeightWithSpacing()});
     }
     igEnd();
   }
