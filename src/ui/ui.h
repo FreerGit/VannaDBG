@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "debugger.h"
+#include "core/debugger.h"
 #include "register_view.h"
 #include "step_view.h"
 

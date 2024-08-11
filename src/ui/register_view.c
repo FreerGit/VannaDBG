@@ -2,8 +2,8 @@
 
 #include "register_view.h"
 
-#include "debugger.h"
-#include "registers.h"
+#include "core/debugger.h"
+#include "core/registers.h"
 #include "ui.h"
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS

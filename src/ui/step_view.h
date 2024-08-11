@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <stdint.h>
 
-#include "slice.h"
+#include "domain/slice.h"
 
 typedef struct {
   char* source_line;

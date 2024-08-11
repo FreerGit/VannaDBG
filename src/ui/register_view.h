@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <stdint.h>
 
-#include "debugger.h"
+#include "core/debugger.h"
 
 typedef struct {
 } register_view_t;

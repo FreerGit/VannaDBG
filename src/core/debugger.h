@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 
 #include "breakpoint.h"
-#include "slice.h"
+#include "domain/slice.h"
 
 SLICE_DEFINITION(breakpoint_t);
 

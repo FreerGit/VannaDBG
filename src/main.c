@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "breakpoint.h"
+#include "core/breakpoint.h"
 #include "core/debugger.h"
 #include "ui/ui.h"
 

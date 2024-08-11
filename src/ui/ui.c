@@ -4,9 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <unistd.h>
 
-#include "debugger.h"
+#include "core/debugger.h"
+#include "core/registers.h"
 #include "register_view.h"
-#include "registers.h"
 #include "step_view.h"
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS

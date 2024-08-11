@@ -7,7 +7,6 @@
 typedef struct {
   int      pid;
   intptr_t addr;
-  bool     x;
 } breakpoint_t;
 
 breakpoint_t

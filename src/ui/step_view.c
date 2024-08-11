@@ -8,7 +8,7 @@
 #include <sys/ptrace.h>
 #include <sys/user.h>
 
-#include "debugger.h"
+#include "core/debugger.h"
 #include "ui.h"
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
@@ -42,62 +42,8 @@ step_view_load() {
 
   view.source_lines.length = line_count;
 
-  // P
-
   return view;
 }
-
-// uintptr_t
-// get_base_address(int pid) {
-//   char path[256];
-//   sprintf(path, "/proc/%d/maps", pid);
-//   FILE *fp = fopen(path, "r");
-//   assert(fp != NULL);
-
-//   uintptr_t base_address = 0;
-//   char      line[256];
-
-//   if (fgets(line, sizeof(line), fp) != NULL) {
-//     sscanf(line, "%lx-%*lx", &base_address);
-//   }
-
-//   fclose(fp);
-//   return base_address;
-// }
-
-// Dwarf_Addr
-// get_base_address(pid_t pid) {
-//   char filename[64];
-//   snprintf(filename, sizeof(filename), "/proc/%d/maps", pid);
-
-//   FILE *fp = fopen(filename, "r");
-//   if (fp == NULL) {
-//     perror("Failed to open maps file");
-//     return 0;
-//   }
-
-//   char       line[256];
-//   Dwarf_Addr base_addr = 0;
-
-//   while (fgets(line, sizeof(line), fp)) {
-//     unsigned long long start, end;
-//     char               permissions[5];
-//     char               path[256];
-
-//     // Parse the line
-//     int matched = sscanf(line, "%llx-%llx %4s %*x %*x:%*x %*d %255s", &start,
-//                          &end, permissions, path);
-
-//     // We're looking for the executable segment of our main program
-//     if (matched == 4 && strstr(permissions, "x") && strstr(path, "a.out")) {
-//       base_addr = start;
-//       break;
-//     }
-//   }
-
-//   fclose(fp);
-//   return base_addr;
-// }
 
 void
 step_view_key_callback(GLFWwindow *window, int key, int scancode, int action,
@@ -138,12 +84,10 @@ step_view_render(step_view_t *view) {
     step_line_t_slice step_line = view->source_lines;
     for (size_t i = 0; i < step_line.length; i++) {
       const char *text = step_line_t_slice_index(&step_line, i).source_line;
+      ImDrawList *draw_list = igGetWindowDrawList();
       if (view->curr_stepline == i) {
-        ImDrawList *draw_list = igGetWindowDrawList();
-
         ImVec2 text_pos, text_size;
         igGetCursorScreenPos(&text_pos);
-        // printf("L: %s\n", step_line);
         igCalcTextSize(&text_size, text, NULL, false, -1.0f);
         ImVec2 rect_min = text_pos;
         ImVec2 rect_max = {text_pos.x + window_size.x,
@@ -152,6 +96,14 @@ step_view_render(step_view_t *view) {
         ImDrawList_AddRectFilled(draw_list, rect_min, rect_max,
                                  igGetColorU32_Vec4(color), 0.0f, 0);
       }
+      ImVec2 text_pos, text_size;
+      igGetCursorScreenPos(&text_pos);
+      igCalcTextSize(&text_size, text, NULL, false, -1.0f);
+      ImVec2 rect_min = text_pos;
+      ImVec2 rect_max = {text_pos.x + 50, text_pos.y + text_size.y};
+      ImVec4 color    = {255, 0, 0, 255};
+      ImDrawList_AddRect(draw_list, rect_min, rect_max,
+                         igGetColorU32_Vec4(color), 0.0f, 0, 0);
       igText("%d: %s", step_line_t_slice_index(&step_line, i).source_num, text);
     }
     igEnd();
