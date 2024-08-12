@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <sys/ptrace.h>
+#include <sys/wait.h>
 
 typedef struct {
   int      pid;
@@ -13,7 +14,7 @@ breakpoint_t
 breakpoint(int pid, intptr_t addr);
 
 breakpoint_t
-breakpoint_create(int pid, char* name);
+breakpoint_create(int pid, uint32_t source_num);
 
 void
 breakpoint_disable(breakpoint_t* brkpt);

@@ -19,7 +19,7 @@ SLICE_IMPLEMENTATION(step_line_t);
 step_view_t
 step_view_load() {
   step_view_t view = {};
-  FILE       *fptr = fopen("test_files/funcs.c", "r");
+  FILE       *fptr = fopen("test_files/breakpoints.c", "r");
   if (fptr == NULL) {
     assert(0 && "could not open file");
   }
@@ -36,7 +36,7 @@ step_view_load() {
           realloc(view.source_lines.ptr, sizeof(step_line_t) * cap);
     }
     view.source_lines.ptr[line_count] =
-        (step_line_t){strdup(strLine), line_count};
+        (step_line_t){strdup(strLine), line_count + 1};
     line_count++;
   }
 
@@ -87,7 +87,7 @@ rgba(uint8_t r, uint8_t g, uint8_t b, float a) {
 }
 
 void
-step_view_render(step_view_t *view) {
+step_view_render(step_view_t *view, debugger_t *dbg) {
   {
     ImVec2 window_size;
     igGetWindowSize(&window_size);
@@ -118,6 +118,9 @@ step_view_render(step_view_t *view) {
       bool is_hovered = igIsItemHovered(ImGuiHoveredFlags_DelayNone);
       if (igIsItemClicked(0)) {
         line->breakpoint_enabled = !line->breakpoint_enabled;
+        if (line->breakpoint_enabled) {
+          breakpoint_create(dbg->pid, line->source_num);
+        }
       }
 
       // Draw the rectangle with hover effect
@@ -129,7 +132,6 @@ step_view_render(step_view_t *view) {
         rect_color =
             igGetColorU32_Vec4((ImVec4){255, 0, 0, 1});  // Red when hovered
       } else {
-        printf("should be void: %s\n", line->source_line);
         rect_color =
             igGetColorU32_Vec4(rgba(166, 172, 205, 1.f));  // Gray when idle
       }

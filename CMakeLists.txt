@@ -22,4 +22,4 @@ add_subdirectory(src)
 
 add_executable(VannaDBG src/main.c)
 
-target_link_libraries(VannaDBG PRIVATE core ui elf)
+target_link_libraries(VannaDBG PRIVATE dwarf core ui elf dw)

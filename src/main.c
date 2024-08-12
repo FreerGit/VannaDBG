@@ -10,8 +10,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "core/breakpoint.h"
 #include "core/debugger.h"
+#include "dwarf/conversion.h"
 #include "ui/ui.h"
 
 void
@@ -42,6 +42,8 @@ main() {
 
     printf("Address of main: 0x%lx\n", main_addr);
 
+    printf("Base addr: 0x%lx\n", get_base_address(pid));
+
     if (WIFEXITED(status)) {
       printf("Child exited\n");
       return -1;
@@ -62,7 +64,7 @@ main() {
 
     // TODO just set a breakpoint for now, later on the dbg will have need a
     // file window of some sort
-    breakpoint_create(pid, "name");
+    // breakpoint_create(pid, "name");
 
     // debugger_run(&dbg);
     // debugger_free(&dbg);

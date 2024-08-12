@@ -28,12 +28,6 @@ debugger_free(debugger_t* dbg);
 void
 continue_execution(debugger_t* dbg);
 
-uintptr_t
-find_main_address(pid_t pid);
-
-uintptr_t
-get_base_address(pid_t pid);
-
 long
 read_memory(debugger_t* dbg, uint64_t addr);
 

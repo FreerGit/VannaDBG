@@ -33,6 +33,7 @@ target_link_libraries(ui PRIVATE
   glfw
   OpenGL::GL
   cimgui
+  core
 )
 
 target_include_directories(ui PUBLIC

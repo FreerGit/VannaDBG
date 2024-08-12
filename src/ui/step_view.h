@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <stdint.h>
 
+#include "core/debugger.h"
 #include "domain/slice.h"
 
 typedef struct {
@@ -27,6 +28,6 @@ step_view_key_callback(GLFWwindow* window, int key, int scancode, int action,
                        int mods);
 
 void
-step_view_render(step_view_t* view);
+step_view_render(step_view_t* view, debugger_t* dbg);
 
 #endif  // STEP_VEW_H

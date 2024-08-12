@@ -113,7 +113,8 @@ start_ui(debugger_t *dbg) {
     // show a simple window that we created ourselves.
     register_view_render(&ui_context.register_view, ui_context.dbg);
     // File display window
-    step_view_render(&ui_context.step_view);
+
+    step_view_render(&ui_context.step_view, ui_context.dbg);
 
     // render
     igRender();
