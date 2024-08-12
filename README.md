@@ -19,6 +19,8 @@ sudo apt-get install elfutils libdw-dev
 sudo apt-get install libgl1-mesa-dev libglfw3-dev
 
 # Assortment of todos that I will force myself to do eventually frfr
-Remove CMake and just use amalgamated build....
+I really want to do a amalgamated build but can't get cimgui to play nice without cmake. Maybe one day, either way I will have to statically compile it to a executable when releasing.
+
 File window
+
 keybindings
