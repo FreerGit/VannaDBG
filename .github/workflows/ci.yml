@@ -27,6 +27,11 @@ jobs:
       run: |
         gcc --version
         cmake --version
+
     - name: Run build script
       run: 
         ./build.sh gcc
+    
+    - name: Run tests
+      run:
+        ./test.sh
