@@ -80,16 +80,23 @@ color_vec4(int r, int g, int b, int a) {
   return igGetColorU32_Vec4(color);
 }
 
+/** r,g,b is 0-255 while a is 0-1 float **/
+ImVec4
+rgba(uint8_t r, uint8_t g, uint8_t b, float a) {
+  return (ImVec4){r / 255.0f, g / 255.0f, b / 255.0f, a};
+}
+
 void
 step_view_render(step_view_t *view) {
   {
     ImVec2 window_size;
     igGetWindowSize(&window_size);
+    igPushStyleColor_Vec4(ImGuiCol_WindowBg, rgba(27, 30, 40, 1.f));
 
     igBegin("test_files/funcs.c", NULL, 0);
     step_line_t_slice step_lines = view->source_lines;
 
-    for (size_t i = 0; i < step_lines.length; i++) {
+    for (uint32_t i = 0; i < step_lines.length; i++) {
       ImDrawList  *draw_list = igGetWindowDrawList();
       step_line_t *line      = step_line_t_slice_ref(&step_lines, i);
 
@@ -101,23 +108,30 @@ step_view_render(step_view_t *view) {
       ImVec2 rect_max = {cursor_pos.x + 50,
                          cursor_pos.y + igGetTextLineHeight()};
 
+      // Make the rectangle and text part of an interactive item
+      igSetCursorScreenPos(rect_min);
+      igInvisibleButton(
+          "##rect", (ImVec2){rect_max.x - rect_min.x, rect_max.y - rect_min.y},
+          0);
+
       // Check if the rectangle is hovered
-      bool is_hovered = igIsMouseHoveringRect(rect_min, rect_max, true);
-      if (igIsItemClicked(0) && is_hovered) {
-        line->breakpoint_enabled = true;
+      bool is_hovered = igIsItemHovered(ImGuiHoveredFlags_DelayNone);
+      if (igIsItemClicked(0)) {
+        line->breakpoint_enabled = !line->breakpoint_enabled;
       }
 
       // Draw the rectangle with hover effect
       ImU32 rect_color;
       if (line->breakpoint_enabled) {
-        rect_color = igGetColorU32_Vec4(
-            (ImVec4){0.0f, 1.0f, 0.0f, 1.0f});  // Green when clicked
+        rect_color =
+            igGetColorU32_Vec4((ImVec4){0, 255, 0, 1});  // Green when clicked
       } else if (is_hovered) {
-        rect_color = igGetColorU32_Vec4(
-            (ImVec4){1.0f, 0.0f, 0.0f, 1.0f});  // Red when hovered
+        rect_color =
+            igGetColorU32_Vec4((ImVec4){255, 0, 0, 1});  // Red when hovered
       } else {
-        rect_color = igGetColorU32_Vec4(
-            (ImVec4){0.6f, 0.6f, 0.6f, 1.0f});  // Gray when idle
+        printf("should be void: %s\n", line->source_line);
+        rect_color =
+            igGetColorU32_Vec4(rgba(166, 172, 205, 1.f));  // Gray when idle
       }
       ImDrawList_AddRectFilled(draw_list, rect_min, rect_max, rect_color, 0.0f,
                                0);
@@ -136,5 +150,6 @@ step_view_render(step_view_t *view) {
           cursor_pos.x, cursor_pos.y + igGetTextLineHeightWithSpacing()});
     }
     igEnd();
+    igPopStyleColor(1);
   }
 }
