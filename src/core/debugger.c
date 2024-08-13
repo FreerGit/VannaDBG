@@ -116,8 +116,6 @@ wait_for_signal(debugger_t* dbg) {
 // void
 // step_over_breakpoint(debugger_t* dbg) {
 //   uint64_t breakpoint_location = get_pc(dbg) - 1;
-//   printf("loc: %li at ptr: %p\n", (intptr_t)breakpoint_location,
-//          &breakpoint_location);
 
 //   breakpoint_addr* bpaddr = (breakpoint_addr*)hashmap_get(
 //       dbg->breakpoints, &(breakpoint_addr){.addr = breakpoint_location});

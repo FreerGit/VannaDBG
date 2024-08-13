@@ -47,7 +47,6 @@ ci() {
 }
 
 if [ "$1" == "build" ]; then
-    clean
     build "$2"
     exit $?
 elif [ "$1" == "rebuild" ]; then

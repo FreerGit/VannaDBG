@@ -28,6 +28,9 @@ debugger_free(debugger_t* dbg);
 void
 continue_execution(debugger_t* dbg);
 
+void
+step_over_breakpoint(debugger_t* dbg);
+
 long
 read_memory(debugger_t* dbg, uint64_t addr);
 

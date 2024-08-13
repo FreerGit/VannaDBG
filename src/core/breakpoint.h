@@ -8,6 +8,7 @@
 typedef struct {
   int      pid;
   intptr_t addr;
+  bool     enabled;
 } breakpoint_t;
 
 breakpoint_t

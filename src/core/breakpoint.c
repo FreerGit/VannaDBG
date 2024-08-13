@@ -17,9 +17,9 @@
 breakpoint_t
 breakpoint(int pid, intptr_t addr) {
   return (breakpoint_t){
-      .pid = pid, .addr = addr,
-      // .enabled    = 0,
-      // .saved_data = 0,
+      .pid     = pid,
+      .addr    = addr,
+      .enabled = 0,
   };
 }
 
@@ -46,7 +46,7 @@ breakpoint_create(int pid, uint32_t source_num) {
 
   assert(ptrace(PTRACE_POKETEXT, pid, addr, int3) != -1);
 
-  return (breakpoint_t){pid, addr};
+  return (breakpoint_t){pid, addr, true};
 }
 
 void
