@@ -5,6 +5,11 @@
 #include "stdint.h"
 #include "string.h"
 
+static inline int
+memeql(void const* s1, void const* s2, size_t sz) {
+  return 0 == memcmp(s1, s2, sz);
+}
+
 /**
  * Use this to implement the functions for a slice type, preferably in the c
  * file to prevent conflicts.

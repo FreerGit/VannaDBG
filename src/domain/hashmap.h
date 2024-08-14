@@ -30,7 +30,6 @@ hashmap_t *
 hashmap_create(arena_t *arena, size_t bucket_count, size_t value_size,
                hash_fn_t hash_func, equal_fn_t equal_func) {
   hashmap_t *map = (hashmap_t *)arena_alloc(arena, sizeof(hashmap_t));
-  printf("hashmap: %p\n", map);
 
   map->buckets =
       (entry_t **)arena_alloc(arena, bucket_count * sizeof(entry_t *));

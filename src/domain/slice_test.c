@@ -23,7 +23,7 @@ slice_new_test(person_t* ppl) {
   person_t       p99          = person_t_slice_value(&slice_last_2, 1);
   TEST_ASSERT_EQL(p98.age, 98);
   TEST_ASSERT_EQL(p99.age, 99);
-  TEST_ASSERT(memcmp(p99.name, "npc", 4) == 0);
+  TEST_ASSERT(memeql(p99.name, "npc", 4));
 }
 
 void
@@ -32,7 +32,7 @@ subslice_test(person_t* ppl) {
   person_t_slice subslice = person_t_slice_subslice(&slice, 5, 10);
   for (size_t i = 0; i < 5; i++) {
     TEST_ASSERT_EQL((size_t)subslice.ptr[i].age, i + 5);
-    TEST_ASSERT(memcmp(subslice.ptr[i].name, "npc", 4) == 0);
+    TEST_ASSERT(memeql(subslice.ptr[i].name, "npc", 4));
   }
 }
 
@@ -42,13 +42,13 @@ slice_index_test(person_t* ppl) {
   for (size_t i = 0; i < 100; i++) {
     person_t p = person_t_slice_value(&slice, i);
     TEST_ASSERT_EQL(p.age, (int)i);
-    TEST_ASSERT(memcmp(p.name, "npc", 4) == 0);
+    TEST_ASSERT(memeql(p.name, "npc", 4));
   }
 
   for (size_t i = 0; i < 100; i++) {
     person_t* p = person_t_slice_ref(&slice, i);
     TEST_ASSERT_EQL(p->age, (int)i);
-    TEST_ASSERT(memcmp(p->name, "npc", 4) == 0);
+    TEST_ASSERT(memeql(p->name, "npc", 4));
     p->age += 5;
     p->name = "NPC";
   }
@@ -58,7 +58,7 @@ slice_index_test(person_t* ppl) {
   for (size_t i = 0; i < 100; i++) {
     person_t p = person_t_slice_value(&slice, i);
     TEST_ASSERT_EQL(p.age, (int)i + 5);
-    TEST_ASSERT(memcmp(p.name, "NPC", 4) == 0);
+    TEST_ASSERT(memeql(p.name, "NPC", 4));
 
     // Mind that slice is just a pointer to the underlying and a
     // length! Slice is different == underlying is different.

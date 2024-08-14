@@ -34,7 +34,6 @@ main() {
   for (uintptr_t i = 0; i < TOTAL_BPS; i++) {
     breakpoint_t bp = (breakpoint_t){.pid = i, .addr = 0, .enabled = true};
     hashmap_put(map, &i, &bp, sizeof(uintptr_t));
-    printf("arena offset: %zu\n", arena.offset);
   }
 
   for (int i = 0; i < (int)TOTAL_BPS; i++) {
