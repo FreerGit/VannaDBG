@@ -13,6 +13,8 @@ set(OpenGL_GL_PREFERENCE LEGACY)
 # Enable warnings
 set (CMAKE_C_FLAGS_WARN "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra")
 
+set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -march=native")
+
 # Enable ASAN on debug builds
 set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer -fsanitize=address")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")

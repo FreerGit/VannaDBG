@@ -6,8 +6,8 @@
 #include <sys/wait.h>
 
 typedef struct {
-  int      pid;
   intptr_t addr;
+  int      pid;
   bool     enabled;
 } breakpoint_t;
 

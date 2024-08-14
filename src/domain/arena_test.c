@@ -6,11 +6,11 @@ TEST_INIT_GLOBAL();
 int
 main() {
   size_t  arena_size = 8ULL * 1024 * 1024 * 1024;  // 8 GB
-  Arena_t arena      = arena_create(arena_size);
+  arena_t arena      = arena_create(arena_size);
 
   arena_alloc(&arena, 100 * sizeof(int));
 
-  Arena_t scratch =
+  arena_t scratch =
       arena_scratch(&arena, 1ULL * 1024 * 1024 * 1024);  // 1 GB temp
 
   size_t *temp_data = (size_t *)arena_alloc(&scratch, 500 * sizeof(size_t));
