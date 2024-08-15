@@ -120,13 +120,13 @@ step_view_render(step_view_t *view, debugger_t *dbg) {
       if (igIsItemClicked(0)) {
         line->breakpoint_enabled = !line->breakpoint_enabled;
         // TODO handle removal of breakpoint.
+        uintptr_t addr_of_line = find_address_by_line(
+            "./test_files/a.out",
+            "/home/a7/dev/VannaDBG/test_files/breakpoints.c", line->source_num);
         if (line->breakpoint_enabled) {
-          uintptr_t addr_of_line = find_address_by_line(
-              "./test_files/a.out",
-              "/home/a7/dev/VannaDBG/test_files/breakpoints.c",
-              line->source_num);
-
           set_breakpoint_at_addr(dbg, addr_of_line);
+        } else {
+          remove_breakpoint_at_addr(dbg, addr_of_line);
         }
       }
 

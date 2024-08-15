@@ -33,6 +33,9 @@ void
 set_breakpoint_at_addr(debugger_t* dbg, intptr_t addr);
 
 void
+remove_breakpoint_at_addr(debugger_t* dbg, intptr_t addr);
+
+void
 step_over_breakpoint(debugger_t* dbg);
 
 long

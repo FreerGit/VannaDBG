@@ -71,10 +71,18 @@ wait_for_signal(debugger_t* dbg) {
 
 void
 set_breakpoint_at_addr(debugger_t* dbg, intptr_t addr) {
-  printf("Set breakpoint at addr 0x%li (0x%ld)\n", addr, (uint64_t)addr);
   breakpoint_t bp = {.addr = addr + dbg->base_addr, .pid = dbg->pid};
   breakpoint_enable(&bp);
   hashmap_put(&dbg->breakpoints, &bp.addr, &bp, sizeof(intptr_t));
+}
+
+void
+remove_breakpoint_at_addr(debugger_t* dbg, intptr_t addr) {
+  const intptr_t absolute_addr = addr + dbg->base_addr;
+  breakpoint_t*  bp            = hashmap_get(&dbg->breakpoints, &absolute_addr);
+  assert(bp != nullptr);
+  hashmap_remove(&dbg->breakpoints, &addr);
+  breakpoint_disable(bp);
 }
 
 void
