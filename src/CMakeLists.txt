@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 project(VannaDBG)
 
 add_subdirectory(core)
-add_subdirectory(domain)
+# add_subdirectory(domain)
 add_subdirectory(dwarf)
 add_subdirectory(ui)
 

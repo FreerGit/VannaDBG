@@ -8,22 +8,19 @@
 typedef struct {
   intptr_t addr;
   int      pid;
+  uint8_t  saved_data;
   bool     enabled;
 } breakpoint_t;
+
+static_assert(sizeof(breakpoint_t) == 16);
 
 breakpoint_t
 breakpoint(int pid, intptr_t addr);
 
-breakpoint_t
-breakpoint_create(int pid, uint32_t source_num);
+void
+breakpoint_enable(breakpoint_t* bp);
 
 void
-breakpoint_disable(breakpoint_t* brkpt);
-
-// bool
-// breakpoint_is_enabled(breakpoint_t* brkpt);
-
-intptr_t
-breakpoint_get_address(breakpoint_t* brkpt);
+breakpoint_disable(breakpoint_t* bp);
 
 #endif  // BREAKPOINT_H

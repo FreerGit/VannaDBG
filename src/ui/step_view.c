@@ -8,7 +8,7 @@
 #include <sys/ptrace.h>
 #include <sys/user.h>
 
-#include "core/debugger.h"
+#include "dwarf/conversion.h"
 #include "ui.h"
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
@@ -63,10 +63,11 @@ step_view_key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (key == GLFW_KEY_SPACE &&
       (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     // Continue execution
-    if (ptrace(PTRACE_CONT, pid, NULL, NULL) == -1) {
-      perror("ptrace(PTRACE_CONT)");
-      return;
-    }
+    continue_execution(ui->dbg);
+    // if (ptrace(PTRACE_CONT, pid, NULL, NULL) == -1) {
+    //   perror("ptrace(PTRACE_CONT)");
+    //   return;
+    // }
 
     // step_view_t *view = &((ui_t
     // *)glfwGetWindowUserPointer(window))->step_view; view->curr_stepline =
@@ -118,8 +119,14 @@ step_view_render(step_view_t *view, debugger_t *dbg) {
       bool is_hovered = igIsItemHovered(ImGuiHoveredFlags_DelayNone);
       if (igIsItemClicked(0)) {
         line->breakpoint_enabled = !line->breakpoint_enabled;
+        // TODO handle removal of breakpoint.
         if (line->breakpoint_enabled) {
-          breakpoint_create(dbg->pid, line->source_num);
+          uintptr_t addr_of_line = find_address_by_line(
+              "./test_files/a.out",
+              "/home/a7/dev/VannaDBG/test_files/breakpoints.c",
+              line->source_num);
+
+          set_breakpoint_at_addr(dbg, addr_of_line);
         }
       }
 

@@ -26,23 +26,22 @@ typedef struct {
   equal_fn_t equal_func;
 } hashmap_t;
 
-hashmap_t *
+static inline hashmap_t
 hashmap_create(arena_t *arena, size_t bucket_count, size_t value_size,
                hash_fn_t hash_func, equal_fn_t equal_func) {
-  hashmap_t *map = (hashmap_t *)arena_alloc(arena, sizeof(hashmap_t));
-
-  map->buckets =
+  hashmap_t map = {};
+  map.buckets =
       (entry_t **)arena_alloc(arena, bucket_count * sizeof(entry_t *));
-  memset(map->buckets, 0, bucket_count * sizeof(entry_t *));
-  map->bucket_count = bucket_count;
-  map->value_size   = value_size;
-  map->arena        = arena;
-  map->hash_func    = hash_func;
-  map->equal_func   = equal_func;
+  memset(map.buckets, 0, bucket_count * sizeof(entry_t *));
+  map.bucket_count = bucket_count;
+  map.value_size   = value_size;
+  map.arena        = arena;
+  map.hash_func    = hash_func;
+  map.equal_func   = equal_func;
   return map;
 }
 
-void
+static inline void
 hashmap_put(hashmap_t *map, const void *key, void *value, size_t key_size) {
   size_t   hash   = map->hash_func(key) % map->bucket_count;
   entry_t *bucket = map->buckets[hash];
@@ -68,7 +67,7 @@ hashmap_put(hashmap_t *map, const void *key, void *value, size_t key_size) {
   map->buckets[hash] = new_entry;
 }
 
-void *
+static inline void *
 hashmap_get(hashmap_t *map, const void *key) {
   size_t   hash   = map->hash_func(key) % map->bucket_count;
   entry_t *bucket = map->buckets[hash];
@@ -82,7 +81,7 @@ hashmap_get(hashmap_t *map, const void *key) {
   return NULL;
 }
 
-void
+static inline void
 hashmap_remove(hashmap_t *map, const void *key) {
   size_t    hash   = map->hash_func(key) % map->bucket_count;
   entry_t **bucket = &map->buckets[hash];

@@ -34,6 +34,7 @@ target_link_libraries(ui PRIVATE
   OpenGL::GL
   cimgui
   core
+  # domain
 )
 
 target_include_directories(ui PUBLIC

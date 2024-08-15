@@ -11,12 +11,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(OpenGL_GL_PREFERENCE LEGACY)
 
 # Enable warnings
+# -Wpadded
 set (CMAKE_C_FLAGS_WARN "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra")
 
 set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -march=native")
 
 # Enable ASAN on debug builds
-set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer -fsanitize=address")
+set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -fno-omit-frame-pointer -fsanitize=address -fdump-ipa-struct-reorg")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
@@ -24,4 +25,11 @@ add_subdirectory(src)
 
 add_executable(VannaDBG src/main.c)
 
-target_link_libraries(VannaDBG PRIVATE dwarf core ui elf dw)
+target_link_libraries(VannaDBG PRIVATE 
+	dwarf 
+	core 
+	# domain 
+	ui 
+	elf 
+	dw
+)

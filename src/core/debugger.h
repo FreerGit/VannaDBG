@@ -5,19 +5,20 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
-#include "breakpoint.h"
-#include "domain/slice.h"
-
-SLICE_DEFINITION(breakpoint_t);
+#include "domain/hashmap.h"
 
 typedef struct {
-  char*              prog_name;
-  int                pid;
-  breakpoint_t_slice breakpoints;
+  arena_t   arena;
+  hashmap_t breakpoints;
+  uintptr_t base_addr;
+  char*     prog_name;
+  int       pid;
 } debugger_t;
 
+static_assert(sizeof(debugger_t) == 96);
+
 debugger_t
-debugger(char* prog_name, int pid);
+debugger(arena_t* arean, char* prog_name, int pid);
 
 void
 debugger_run(debugger_t* dbg);
@@ -27,6 +28,9 @@ debugger_free(debugger_t* dbg);
 
 void
 continue_execution(debugger_t* dbg);
+
+void
+set_breakpoint_at_addr(debugger_t* dbg, intptr_t addr);
 
 void
 step_over_breakpoint(debugger_t* dbg);

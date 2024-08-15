@@ -60,7 +60,10 @@ main() {
     assert(fp != NULL);
     assert(fd != 0);
 
-    debugger_t dbgr = debugger("./test_files/a.out", pid);
+    arena_t vanna_arena = arena_create(1024 * 1024 * 1024);
+
+    arena_t    dbg_arena = arena_scratch(&vanna_arena, 1024 * 1024 * 8);
+    debugger_t dbgr      = debugger(&dbg_arena, "./test_files/a.out", pid);
 
     // TODO just set a breakpoint for now, later on the dbg will have need a
     // file window of some sort

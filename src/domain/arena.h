@@ -22,7 +22,7 @@ align_to_page_size(size_t size) {
   return (size + ARENA_PAGE_SIZE - 1) & ~(ARENA_PAGE_SIZE - 1);
 }
 
-arena_t
+static inline arena_t
 arena_create(size_t capacity) {
   arena_t arena;
   size_t  aligned_capacity = align_to_page_size(capacity);
@@ -37,7 +37,7 @@ arena_create(size_t capacity) {
   return arena;
 }
 
-void *
+static inline void *
 arena_alloc(arena_t *arena, size_t size) {
   size_t aligned_size =
       (size + sizeof(uintptr_t) - 1) & ~(sizeof(uintptr_t) - 1);
@@ -52,7 +52,7 @@ arena_alloc(arena_t *arena, size_t size) {
   return ptr;
 }
 
-arena_t
+static inline arena_t
 arena_scratch(arena_t *arena, size_t size) {
   size_t  temp_capacity = align_to_page_size(size);
   arena_t temp_arena    = {.base     = arena->base + arena->offset,
@@ -66,12 +66,12 @@ arena_scratch(arena_t *arena, size_t size) {
   return temp_arena;
 }
 
-void
+static inline void
 arena_reset(arena_t *arena) {
   arena->offset = 0;
 }
 
-void
+static inline void
 arena_destroy(arena_t *arena) {
   munmap(arena->base, arena->capacity);
 }

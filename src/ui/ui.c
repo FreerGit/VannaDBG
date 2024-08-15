@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #include "core/debugger.h"
-#include "core/registers.h"
+// #include "core/registers.h"
 #include "register_view.h"
 #include "step_view.h"
 

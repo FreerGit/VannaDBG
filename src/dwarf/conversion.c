@@ -106,7 +106,7 @@ get_base_address(pid_t pid) {
 
 // Function to find the address corresponding to a line in a source file
 uintptr_t
-find_address_by_line(const char *filename, const char *source_file,
+find_address_by_line(const char *exe_path, const char *source_path,
                      int line_number) {
   Dwfl_Callbacks callbacks = {.find_elf        = dwfl_linux_proc_find_elf,
                               .find_debuginfo  = dwfl_standard_find_debuginfo,
@@ -118,7 +118,7 @@ find_address_by_line(const char *filename, const char *source_file,
     return 0;
   }
 
-  Dwfl_Module *module = dwfl_report_offline(dwfl, filename, filename, -1);
+  Dwfl_Module *module = dwfl_report_offline(dwfl, exe_path, exe_path, -1);
   if (!module) {
     fprintf(stderr, "dwfl_report_offline: %s\n", dwfl_errmsg(-1));
     dwfl_end(dwfl);
@@ -165,7 +165,7 @@ find_address_by_line(const char *filename, const char *source_file,
       }
       printf("linno: %d\nsrc file: %s\n", lineno, src_file);
       // Check if the line matches the requested file and line number
-      if (strcmp(src_file, source_file) == 0 && lineno == line_number) {
+      if (strcmp(src_file, source_path) == 0 && lineno == line_number) {
         dwfl_end(dwfl);
         printf("bias: 0x%lx\n", bias);
         return addr;
