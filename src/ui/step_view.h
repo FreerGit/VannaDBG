@@ -16,7 +16,6 @@ typedef struct {
 SLICE_DEFINITION(step_line_t);
 
 typedef struct {
-  size_t            curr_stepline;
   step_line_t_slice source_lines;
 } step_view_t;
 

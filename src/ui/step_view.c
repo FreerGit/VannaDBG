@@ -8,6 +8,7 @@
 #include <sys/ptrace.h>
 #include <sys/user.h>
 
+#include "core/debugger.h"
 #include "dwarf/conversion.h"
 #include "ui.h"
 
@@ -64,6 +65,13 @@ step_view_key_callback(GLFWwindow *window, int key, int scancode, int action,
       (action == GLFW_PRESS || action == GLFW_REPEAT)) {
     // Continue execution
     continue_execution(ui->dbg);
+    // size_t line_num = ui->step_view.curr_stepline;
+    // printf("num: %d\n", line_num);
+    // step_line_t *line =
+    //     step_line_t_slice_ref(&ui->step_view.source_lines, line_num);
+
+    // line->breakpoint_enabled = false;
+
     // if (ptrace(PTRACE_CONT, pid, NULL, NULL) == -1) {
     //   perror("ptrace(PTRACE_CONT)");
     //   return;
@@ -100,8 +108,7 @@ step_view_render(step_view_t *view, debugger_t *dbg) {
     for (uint32_t i = 0; i < step_lines.length; i++) {
       ImDrawList  *draw_list = igGetWindowDrawList();
       step_line_t *line      = step_line_t_slice_ref(&step_lines, i);
-
-      ImVec2 cursor_pos;
+      ImVec2       cursor_pos;
       igGetCursorScreenPos(&cursor_pos);  // Get current cursor position
 
       // Define rectangle area
@@ -119,7 +126,7 @@ step_view_render(step_view_t *view, debugger_t *dbg) {
       bool is_hovered = igIsItemHovered(ImGuiHoveredFlags_DelayNone);
       if (igIsItemClicked(0)) {
         line->breakpoint_enabled = !line->breakpoint_enabled;
-        // TODO handle removal of breakpoint.
+
         uintptr_t addr_of_line = find_address_by_line(
             "./test_files/a.out",
             "/home/a7/dev/VannaDBG/test_files/breakpoints.c", line->source_num);
@@ -150,7 +157,14 @@ step_view_render(step_view_t *view, debugger_t *dbg) {
           rect_max.x + 5, cursor_pos.y});  // Adding a small padding of 5 pixels
 
       // Draw the text
-      igText("%d: %s", line->source_num, line->source_line);
+      int current_souce_line = get_source_line_from_rip(dbg->pid, get_pc(dbg));
+
+      if (current_souce_line == line->source_num) {
+        igTextColored(rgba(255, 0, 0, 1.f), "%d: %s", line->source_num,
+                      line->source_line);
+      } else {
+        igText("%d: %s", line->source_num, line->source_line);
+      }
 
       // Submit a dummy item to validate the new extent
       igDummy((ImVec2){window_size.x, igGetTextLineHeightWithSpacing()});

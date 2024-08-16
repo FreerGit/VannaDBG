@@ -8,6 +8,8 @@ Vanna Volma Charm Banana
 # Notes
 deal w/ inlining
 
+Bind the UI to the breakpoint, when a breakpoint is stepped over it should not display.
+
 # Compile
 Install glfw3 & opengl3:
 

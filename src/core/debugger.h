@@ -44,4 +44,7 @@ read_memory(debugger_t* dbg, uint64_t addr);
 long
 write_memory(debugger_t* dbg, uint64_t addr, uint64_t value);
 
+uint64_t
+get_pc(debugger_t* dbg);
+
 #endif  // DEBUGGER_H

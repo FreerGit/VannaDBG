@@ -1,6 +1,8 @@
 #ifndef TIMING_H
 #define TIMING_H
 
+#include "time.h"
+
 #define get_tickcount() ((long)__builtin_ia32_rdtsc())
 
 #define TICKCOUNT_OF_BLOCK(x)       \

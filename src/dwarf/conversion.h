@@ -14,4 +14,7 @@ uintptr_t
 find_address_by_line(const char *filename, const char *source_file,
                      int line_number);
 
+int
+get_source_line_from_rip(int pid, uintptr_t rip);
+
 #endif  // CONVERSION_H
