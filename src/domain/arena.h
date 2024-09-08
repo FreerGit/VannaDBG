@@ -52,6 +52,19 @@ arena_alloc(arena_t *arena, size_t size) {
   return ptr;
 }
 
+static inline void *
+arena_realloc(arena_t *arena, void *ptr, size_t old_size, size_t new_size) {
+  if (new_size <= old_size) {
+    return ptr;
+  }
+
+  void *new_ptr = arena_alloc(arena, new_size);
+  assert(new_ptr);
+
+  memcpy(new_ptr, ptr, old_size);
+  return new_ptr;
+}
+
 static inline arena_t
 arena_scratch(arena_t *arena, size_t size) {
   size_t  temp_capacity = align_to_page_size(size);
