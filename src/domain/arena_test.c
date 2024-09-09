@@ -37,7 +37,7 @@ main() {
     }
   }
 
-  TEST_ASSERT_EQL(scratch.offset, 300);
+  TEST_ASSERT_EQL(scratch.offset, 300 * sizeof(size_t));
 
   // Reset the memory and destory the arena (you can of course just skip
   // arena_reset here)

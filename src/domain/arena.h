@@ -42,27 +42,13 @@ arena_alloc(arena_t *arena, size_t size) {
   size_t aligned_size =
       (size + sizeof(uintptr_t) - 1) & ~(sizeof(uintptr_t) - 1);
 
-  size_t units = aligned_size / sizeof(uintptr_t);
-
-  assert(arena->offset + units <= arena->capacity && "Out of memory in arena!");
+  assert(arena->offset + aligned_size <= arena->capacity &&
+         "Out of memory in arena!");
 
   void *ptr = (void *)(arena->base + arena->offset);
-  arena->offset += units;
+  arena->offset += aligned_size;
 
   return ptr;
-}
-
-static inline void *
-arena_realloc(arena_t *arena, void *ptr, size_t old_size, size_t new_size) {
-  if (new_size <= old_size) {
-    return ptr;
-  }
-
-  void *new_ptr = arena_alloc(arena, new_size);
-  assert(new_ptr);
-
-  memcpy(new_ptr, ptr, old_size);
-  return new_ptr;
 }
 
 static inline arena_t

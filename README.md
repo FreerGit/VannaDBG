@@ -26,3 +26,5 @@ I really want to do a amalgamated build but can't get cimgui to play nice withou
 File window
 
 keybindings
+
+Lazy loading of modules, loading everything at startup won't be a problem for my projects. I have no idea what would happen with say >100k LOC.
