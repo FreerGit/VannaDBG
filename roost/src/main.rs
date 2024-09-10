@@ -1,12 +1,18 @@
 use eframe::egui;
 use nix::{
-    libc::{c_ulong, fork, personality, waitpid, ADDR_NO_RANDOMIZE},
+    libc::{
+        c_char, c_ulong, execl, fork, perror, personality, ptrace, waitpid, ADDR_NO_RANDOMIZE,
+        PTRACE_TRACEME,
+    },
     unistd::sleep,
 };
 use object::{Object, ObjectSymbol, ObjectSymbolTable};
 use timing_rdtsc::timing_return;
 
-use std::{fmt::format, fs::File, io::Read, time::Instant};
+use std::{
+    ffi::CString, fmt::format, fs::File, io::Read, path::Path, process::exit, ptr::null,
+    time::Instant,
+};
 
 fn find_main_address(pid: i32) -> Option<u64> {
     let exe_path = format!("/proc/{}/exe", pid);
@@ -24,7 +30,7 @@ fn find_main_address(pid: i32) -> Option<u64> {
         let name = symbol.name().ok()?;
         if name == "main" {
             // Calculate the address of the "main" function.
-            let base_address = get_base_address(pid as u32)?;
+            let base_address = get_base_address(pid)?;
             return Some(symbol.address() + base_address);
         }
     }
@@ -32,7 +38,7 @@ fn find_main_address(pid: i32) -> Option<u64> {
     None
 }
 
-fn get_base_address(pid: u32) -> Option<u64> {
+fn get_base_address(pid: i32) -> Option<u64> {
     // Parse the memory map of the process from `/proc/<pid>/maps` to get the base address.
     let maps_path = format!("/proc/{}/maps", pid);
     let mut maps_file = File::open(maps_path).ok()?;
@@ -50,6 +56,30 @@ fn get_base_address(pid: u32) -> Option<u64> {
     None
 }
 
+// void
+// execute_debugee(char *prog_name) {
+//   if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0) {
+//     printf("Error in ptrace\n");
+//     return;
+//   }
+
+//   execl(prog_name, prog_name, NULL);
+//   perror("execl");
+//   exit(1);
+// }
+
+fn execute_debugee(prog_name: &str) {
+    unsafe {
+        if ptrace(PTRACE_TRACEME, 0, 0, 0) < 0 {
+            panic!("Error in ptrace");
+        }
+        let name = CString::new(prog_name).unwrap();
+        execl(name.as_c_str().as_ptr(), null());
+        perror("execl".as_ptr() as *const c_char);
+        exit(1);
+    };
+}
+
 fn main() {
     let pid = unsafe { fork() };
     println!("pid: {}", pid);
@@ -57,13 +87,16 @@ fn main() {
     if pid == 0 {
         // TODO(improvement): ASLR is enabled for now, this should be user definable
         unsafe { personality(ADDR_NO_RANDOMIZE as c_ulong) };
+        execute_debugee("../test_files/a.out");
         sleep(5);
     } else {
         let status: *mut i32 = std::ptr::null_mut();
 
-        let (res, t) = timing_return(|| find_main_address(pid).unwrap());
+        let (main_addr, t1) = timing_return(|| find_main_address(pid).unwrap());
+        let (base, t2) = timing_return(|| get_base_address(pid).unwrap());
 
-        println!("done: {:#x} in {:?}", res, t);
+        println!("done: {:#x} in {:?}", main_addr, t1);
+        println!("done: {:#x} in {:?}", base, t2);
         unsafe { waitpid(pid, status, 0) };
     }
 
