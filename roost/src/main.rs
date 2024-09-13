@@ -1,4 +1,5 @@
 use eframe::egui;
+use egui::{viewport, ViewportBuilder};
 use nix::{
     libc::{
         c_char, c_ulong, execl, fork, perror, personality, ptrace, waitpid, ADDR_NO_RANDOMIZE,
@@ -81,31 +82,38 @@ fn execute_debugee(prog_name: &str) {
 }
 
 fn main() {
-    let pid = unsafe { fork() };
-    println!("pid: {}", pid);
+    // let pid = unsafe { fork() };
+    // println!("pid: {}", pid);
 
-    if pid == 0 {
-        // TODO(improvement): ASLR is enabled for now, this should be user definable
-        unsafe { personality(ADDR_NO_RANDOMIZE as c_ulong) };
-        execute_debugee("../test_files/a.out");
-        sleep(5);
-    } else {
-        let status: *mut i32 = std::ptr::null_mut();
+    // if pid == 0 {
+    //     // TODO(improvement): ASLR is enabled for now, this should be user definable
+    //     unsafe { personality(ADDR_NO_RANDOMIZE as c_ulong) };
+    //     execute_debugee("../test_files/a.out");
+    //     sleep(5);
+    // } else {
+    //     let status: *mut i32 = std::ptr::null_mut();
 
-        let (main_addr, t1) = timing_return(|| find_main_address(pid).unwrap());
-        let (base, t2) = timing_return(|| get_base_address(pid).unwrap());
+    //     let (main_addr, t1) = timing_return(|| find_main_address(pid).unwrap());
+    //     let (base, t2) = timing_return(|| get_base_address(pid).unwrap());
 
-        println!("done: {:#x} in {:?}", main_addr, t1);
-        println!("done: {:#x} in {:?}", base, t2);
-        unsafe { waitpid(pid, status, 0) };
-    }
+    //     println!("done: {:#x} in {:?}", main_addr, t1);
+    //     println!("done: {:#x} in {:?}", base, t2);
+    //     unsafe { waitpid(pid, status, 0) };
+    // }
+    let mut wp = ViewportBuilder {
+        ..Default::default()
+    };
+    wp = wp.with_decorations(false);
+    let native_options = eframe::NativeOptions {
+        viewport: wp,
+        ..Default::default()
+    };
 
-    // let native_options = eframe::NativeOptions::default();
-    // eframe::run_native(
-    //     "My egui App",
-    //     native_options,
-    //     Box::new(|cc| Ok(Box::new(MyEguiApp::new(cc)))),
-    // );
+    eframe::run_native(
+        "My egui App",
+        native_options,
+        Box::new(|cc| Ok(Box::new(MyEguiApp::new(cc)))),
+    );
 }
 
 // #[derive(Default)]

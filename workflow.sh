@@ -17,7 +17,7 @@ build() {
 
     mkdir -p build
     cd build/
-    cmake -DCMAKE_BUILD_TYPE=Warn -DCMAKE_C_STANDARD=23 -DCMAKE_C_COMPILER="$C_COMPILER" ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_STANDARD=23 -DCMAKE_C_COMPILER="$C_COMPILER" ..
     cmake --build . -- -j$(nproc)
     cd ..
 }

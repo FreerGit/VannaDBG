@@ -157,14 +157,15 @@ step_view_render(step_view_t *view, debugger_t *dbg) {
           rect_max.x + 5, cursor_pos.y});  // Adding a small padding of 5 pixels
 
       // Draw the text
-      int current_souce_line = get_source_line_from_rip(dbg->pid, get_pc(dbg));
+      // int current_souce_line = get_source_line_from_rip(dbg->pid,
+      // get_pc(dbg));
 
-      if (current_souce_line == line->source_num) {
-        igTextColored(rgba(255, 0, 0, 1.f), "%d: %s", line->source_num,
-                      line->source_line);
-      } else {
-        igText("%d: %s", line->source_num, line->source_line);
-      }
+      // if (current_souce_line == line->source_num) {
+      //   igTextColored(rgba(255, 0, 0, 1.f), "%d: %s", line->source_num,
+      //                 line->source_line);
+      // } else {
+      //   igText("%d: %s", line->source_num, line->source_line);
+      // }
 
       // Submit a dummy item to validate the new extent
       igDummy((ImVec2){window_size.x, igGetTextLineHeightWithSpacing()});

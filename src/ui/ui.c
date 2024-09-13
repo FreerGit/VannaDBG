@@ -59,7 +59,7 @@ start_ui(debugger_t *dbg) {
   glfwMakeContextCurrent(window);
 
   // enable vsync
-  glfwSwapInterval(1);
+  glfwSwapInterval(0);
 
   // setup imgui
   igCreateContext(NULL);
