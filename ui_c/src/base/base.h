@@ -27,4 +27,14 @@ typedef bool     Bool;
 #define GB(x) (((U64)(x)) << 30)
 #define TB(x) (((U64)(x)) << 40)
 
+// Vec types
+
+typedef union {
+  struct {
+    F32 x;
+    F32 y;
+  };
+  F32 v[2];
+} Vec2F32;
+
 #endif  // BASE_H
