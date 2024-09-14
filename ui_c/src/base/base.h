@@ -1,6 +1,7 @@
 #ifndef BASE_H
 #define BASE_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 // Base types
@@ -18,6 +19,7 @@ typedef S32      B32;
 typedef S64      B64;
 typedef float    F32;
 typedef double   F64;
+typedef bool     Bool;
 
 // Units
 #define KB(x) (((U64)(x)) << 10)

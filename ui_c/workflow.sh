@@ -41,9 +41,24 @@ if [ -v release ]; then compile="$compile_release"; fi
 # Prep directory
 mkdir -p build
 
+# Find all tests files -> build and run sequentially
+function build_then_run_tests_seq() {
+  test_files=$(find ../src/ -type f -name '*_test.c')
+  
+  while IFS= read -r file; do
+      echo "Processing file: $file"
+      # Remove path and extension
+      base_name=$(basename "$file" .c)
+      echo $base_name
+      $compile $file $compile_link $out $base_name
+      ../build/$base_name
+  done <<< "$test_files"
+}
+
 # Build
 cd build
-if [ -v vanna ]; then didbuild=1 && $compile ../main.c $compile_link $out vanna; fi
+if [ -v vanna ]; then didbuild=1 && bear -- $compile ../src/main.c $compile_link $out vanna; fi
+if [ -v test ]; then didbuild=1 && build_then_run_tests_seq; fi
 cd ..
 
 # Warn on no builds
@@ -52,3 +67,8 @@ then
   echo "[WARNING] no valid build target specified; must use build target names as arguments to this script, like \`./workflow.sh vanna\`."
   exit 1
 fi
+
+# Build all tests files
+
+
+
