@@ -4,9 +4,11 @@
 #include "base.h"
 
 typedef struct {
-  B8 *str;
+  U8 *str;
   U64 size;
 } String8;
+
+// Character expect
 
 Bool
 char_is_space(U8 c);
@@ -19,5 +21,21 @@ char_is_lower(U8 c);
 
 Bool
 char_is_digit(U8 c);
+
+// C-string
+U64
+cstring8_len(U8 *c);
+
+// String8 constructors
+#define str8_lit(S) str8((U8 *)(S), sizeof(S) - 1)
+
+String8
+str8(U8 *str, U64 size);
+
+String8
+str8_range(U8 *first, U8 *one_past_last);
+
+String8
+str8_zero();
 
 #endif  // STRING8_H

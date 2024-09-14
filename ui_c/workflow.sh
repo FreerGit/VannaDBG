@@ -43,7 +43,7 @@ mkdir -p build
 
 # Find all tests files -> build and run sequentially
 function build_then_run_tests_seq() {
-  test_files=$(find ../src/ -type f -name '*_test.c')
+  test_files=$(find src/ -type f -name '*_test.c')
   
   while IFS= read -r file; do
       echo "Processing file: $file"
@@ -51,15 +51,16 @@ function build_then_run_tests_seq() {
       base_name=$(basename "$file" .c)
       echo $base_name
       $compile $file $compile_link $out $base_name
-      ../build/$base_name
+      mv $base_name build/$base_name
+      ./build/$base_name
   done <<< "$test_files"
 }
 
 # Build
-cd build
-if [ -v vanna ]; then didbuild=1 && bear -- $compile ../src/main.c $compile_link $out vanna; fi
+# cd build
+if [ -v vanna ]; then didbuild=1 && bear -- $compile src/main.c $compile_link $out vanna && mv vanna build/vanna; fi
 if [ -v test ]; then didbuild=1 && build_then_run_tests_seq; fi
-cd ..
+cd ../
 
 # Warn on no builds
 if [ ! -v didbuild ]

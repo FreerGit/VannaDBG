@@ -1,2 +1,5 @@
 # Build (target) directory
 build
+
+# Clangd LSP context
+compile_commands.json

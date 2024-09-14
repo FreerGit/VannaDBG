@@ -20,3 +20,27 @@ Bool
 char_is_digit(U8 c) {
   return ('0' <= c && c <= '9');
 }
+
+U64
+cstring8_len(U8 *c) {
+  U8 *p = c;
+  while (*p != 0) p += 1;
+  return p - c;
+}
+
+String8
+str8(U8 *str, U64 size) {
+  String8 result = {str, size};
+  return result;
+}
+
+String8
+str8_range(U8 *first, U8 *one_past_last) {
+  String8 result = {first, (U64)(one_past_last - first)};
+  return result;
+}
+
+String8
+str8_zero() {
+  return (String8){0};
+}
