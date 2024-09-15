@@ -28,6 +28,8 @@ cstring8_len(U8 *c);
 
 // String8 constructors
 #define str8_lit(S) str8((U8 *)(S), sizeof(S) - 1)
+#define str8_lit_comp(S) \
+  { (U8 *)(S), sizeof(S) - 1, }
 
 String8
 str8(U8 *str, U64 size);

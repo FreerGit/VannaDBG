@@ -42,17 +42,17 @@ align_to_page_size(U64 size) {
 
 // Arena creation/destruction
 
-static inline Arena
+static inline Arena *
 arena_alloc(U64 capacity) {
-  Arena arena;
-  U64   aligned_capacity = align_to_page_size(capacity);
+  U64 aligned_capacity = align_to_page_size(capacity);
 
-  arena.base = mmap(NULL, aligned_capacity, PROT_READ | PROT_WRITE,
+  void *base = mmap(NULL, aligned_capacity, PROT_READ | PROT_WRITE,
                     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-  assert(arena.base != MAP_FAILED && "MMAP failed");
+  assert(base != MAP_FAILED && "MMAP failed");
 
-  arena.offset   = 0;
-  arena.capacity = aligned_capacity;
+  Arena *arena    = (Arena *)base;
+  arena->offset   = 0;
+  arena->capacity = aligned_capacity;
 
   return arena;
 }
@@ -118,3 +118,6 @@ static inline void
 arena_scratch_end(Scratch scratch_arena) {
   arena_pop_to(scratch_arena.arena, scratch_arena.offset);
 }
+
+// Macro helpers
+#define push_array(arena, T, n) arena_push(arena, (sizeof(T) * n))

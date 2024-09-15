@@ -40,6 +40,10 @@ main() {
   TEST_ASSERT_EQL(str.size, 10)
   TEST_ASSERT_EQL(strcmp((char*)str.str, (char*)c), 0);
 
+  String8 s = str8_lit_comp("A static cstring");
+
+  TEST_ASSERT(s.size == 16);
+
   String8 str_range = str8_range(&c[2], &c[8]);
   TEST_ASSERT_EQL(strcmp((char*)str_range.str, "C-string"), 0);
   TEST_ASSERT_EQL(str_range.size, 6);

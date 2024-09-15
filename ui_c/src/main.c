@@ -2,6 +2,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "os/os_inc.c"
+#include "os/os_inc.h"
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -58,30 +61,21 @@ mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 
 int
 main() {
-  if (!glfwInit()) {
-    fprintf(stderr, "Failed to initialize GLFW\n");
-    return -1;
-  }
+  os_gfx_init();
 
-  GLFWwindow* window = glfwCreateWindow(
-      WINDOW_WIDTH, WINDOW_HEIGHT, "Immediate Mode UI Example", NULL, NULL);
-  if (!window) {
-    fprintf(stderr, "Failed to create GLFW window\n");
-    glfwTerminate();
-    return -1;
-  }
+  Vec2F32 resolution = {.x = 800, .y = 600};
 
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(0);
+  String8 title  = str8_lit_comp("Custom UI thing");
+  Window  window = os_window_open(resolution, title);
 
   double lastTime = glfwGetTime();
   int    nbFrames = 0;
 
   Button btn = createButton(300, 250, 200, 100, 0.2f, 0.6f, 1.0f);
-  glfwSetWindowUserPointer(window, &btn);
-  glfwSetMouseButtonCallback(window, mouseButtonCallback);
+  glfwSetWindowUserPointer(window.handle, &btn);
+  glfwSetMouseButtonCallback(window.handle, mouseButtonCallback);
 
-  while (!glfwWindowShouldClose(window)) {
+  for (U8 quit = 0; quit == 0;) {
     double currentTime = glfwGetTime();
     nbFrames++;
     if (currentTime - lastTime >=
@@ -92,7 +86,7 @@ main() {
     }
 
     int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
+    glfwGetFramebufferSize(window.handle, &width, &height);
     glViewport(0, 0, width, height);
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -104,11 +98,13 @@ main() {
 
     drawButton(&btn);
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(window.handle);
     glfwPollEvents();
+
+    quit = os_window_should_close(&window);
   }
 
-  glfwDestroyWindow(window);
+  glfwDestroyWindow(window.handle);
   glfwTerminate();
   return 0;
 }
