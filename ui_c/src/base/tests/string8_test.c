@@ -1,9 +1,8 @@
-#include "../string8.h"
 
 #include <string.h>
 
-#include "../libtest.h"
-#include "../string8.c"
+#include "base/base_inc.c"
+#include "base/base_testlib.h"
 
 TEST_INIT_GLOBAL();
 

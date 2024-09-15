@@ -1,7 +1,7 @@
-#ifndef LIBTEST_H
-#define LIBTEST_H
+#ifndef BASE_TESTLIB_H
+#define BASE_TESTLIB_H
 
-#include <stdio.h>
+#include <stdio.h>  // IWYU pragma: export
 
 #define TEST_INIT_GLOBAL() \
   int global_total_tests;  \
@@ -32,4 +32,4 @@
     printf("\x1B[31m%s(%d): test failed!\e[0m\n", __FILE__, __LINE__); \
   }
 
-#endif  // LIBTEST_H
+#endif  // BASE_TESTLIB_H

@@ -1,5 +1,5 @@
-#ifndef STRING8_H
-#define STRING8_H
+#ifndef BASE_STRING8_H
+#define BASE_STRING8_H
 
 #include "base.h"
 
@@ -38,4 +38,4 @@ str8_range(U8 *first, U8 *one_past_last);
 String8
 str8_zero();
 
-#endif  // STRING8_H
+#endif  // BASE_STRING8_H
