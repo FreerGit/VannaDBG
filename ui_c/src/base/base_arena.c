@@ -16,33 +16,9 @@ align_to_page_size(U64 size) {
   return (size + ARENA_PAGE_SIZE - 1) & ~(ARENA_PAGE_SIZE - 1);
 }
 
-// static inline Arena
-// arena_scratch(Arena *arena, size_t size) {
-//   size_t temp_capacity = align_to_page_size(size);
-//   Arena  temp_arena    = {.base     = arena->base + arena->offset,
-//                           .offset   = 0,
-//                           .capacity = temp_capacity};
-
-//   assert(arena->offset + temp_capacity <= arena->capacity &&
-//          "Out of memory in main arena!");
-//   arena->offset += temp_capacity;
-
-//   return temp_arena;
-// }
-
-// static inline void
-// arena_reset(Arena *arena) {
-//   arena->offset = 0;
-// }
-
-// static inline void
-// arena_destroy(Arena *arena) {
-//   munmap(arena->base, arena->capacity);
-// }
-
 // Arena creation/destruction
 
-static inline Arena *
+static inline Arena
 arena_alloc(U64 capacity) {
   U64 aligned_capacity = align_to_page_size(capacity);
 
@@ -50,10 +26,7 @@ arena_alloc(U64 capacity) {
                     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
   assert(base != MAP_FAILED && "MMAP failed");
 
-  Arena *arena    = (Arena *)base;
-  arena->offset   = 0;
-  arena->capacity = aligned_capacity;
-
+  Arena arena = {base, 0, aligned_capacity};
   return arena;
 }
 

@@ -16,7 +16,7 @@ typedef struct {
 
 // Arena creation/destruction
 
-static inline Arena *
+static inline Arena
 arena_alloc(U64 capacity);
 
 static inline void

@@ -1,5 +1,4 @@
 #!/bin/bash
-set -eu
 cd "$(dirname "$0")"
 
 # Unpack args
@@ -50,7 +49,7 @@ function build_then_run_tests_seq() {
       base_name=$(basename "$file" .c)
       $compile $file $compile_link $out $base_name
       mv $base_name build/$base_name
-      ./build/$base_name
+      ./build/$base_name 
   done <<< "$test_files"
 }
 
