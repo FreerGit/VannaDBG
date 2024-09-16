@@ -1,5 +1,5 @@
 use eframe::egui;
-use egui::{viewport, ViewportBuilder};
+use egui::{viewport, Align, Layout, ViewportBuilder};
 use nix::{
     libc::{
         c_char, c_ulong, execl, fork, perror, personality, ptrace, waitpid, ADDR_NO_RANDOMIZE,
@@ -131,6 +131,7 @@ fn main() {
 
 // #[derive(Default)]
 struct MyEguiApp {
+    is_fullscreen: bool,
     last_update: Instant,
     fps: f32,
 }
@@ -139,6 +140,7 @@ impl MyEguiApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // Customize egui here if needed
         Self {
+            is_fullscreen: false,
             last_update: Instant::now(),
             fps: 0.0,
         }
@@ -152,6 +154,29 @@ impl eframe::App for MyEguiApp {
         let delta_time = now.duration_since(self.last_update);
         self.last_update = now;
         self.fps = 1.0 / delta_time.as_secs_f32();
+
+        if ctx.input(|i| i.viewport().close_requested()) {
+            // ctx.
+        }
+
+        egui::TopBottomPanel::top("A panel").show(ctx, |ui| {
+            ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
+                if ui.button("❌").clicked() {
+                    ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+                }
+
+                let fullscreen_button = if self.is_fullscreen { "🔲" } else { "🗖" };
+                if ui.button(fullscreen_button).clicked() {
+                    self.is_fullscreen = !self.is_fullscreen;
+                    ui.ctx()
+                        .send_viewport_cmd(egui::ViewportCommand::Fullscreen(self.is_fullscreen));
+                }
+                if ui.button("🗕").clicked() {
+                    ui.ctx()
+                        .send_viewport_cmd(egui::ViewportCommand::Minimized(true));
+                }
+            });
+        });
 
         // Egui panel for UI
         egui::CentralPanel::default().show(ctx, |ui| {

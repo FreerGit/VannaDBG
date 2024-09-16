@@ -19,7 +19,7 @@ os_window_open(Vec2F32 resolution, String8 title) {
   }
 
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(0);
+  glfwSwapInterval(1);
   return (Window){.handle = window};
 }
 

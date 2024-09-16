@@ -58,7 +58,6 @@ mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     }
   }
 }
-
 int
 main() {
   os_gfx_init();
