@@ -16,21 +16,6 @@ typedef struct {
 
 typedef U64 UI_Key;
 
-// TODO box?
-typedef struct {
-  // TODO arena
-  Arena* arena;
-
-  // User interation state
-  UI_Key hot;
-
-  //   User inpute state
-  Vec2F32 mouse_pos;
-
-  // Stacks
-  // UI_Parent_
-} UI_State;
-
 typedef struct UI_Box UI_Box;
 struct UI_Box {
   // Persistent links (to carry data across frames)
@@ -57,6 +42,34 @@ typedef U64 UI_BoxFlags;
 
 #define UI_BoxFlags_MouseClickable (UI_BoxFlags)(1ull << 0)
 
+typedef struct UI_ParentNode UI_ParentNode;
+struct UI_ParentNode {
+  UI_ParentNode* next;
+  UI_Box*        v;
+};
+
+// TODO box?
+typedef struct {
+  // TODO arena
+  Arena* arena;
+
+  // User interation state
+  UI_Key hot;
+
+  //   User inpute state
+  Vec2F32 mouse_pos;
+
+  // Stacks
+  struct {
+    UI_ParentNode* top;
+    UI_Box*        bottom_val;
+    // Free list, SLL of popped nodes that can be re-used.
+    // UI_ParentNode* free;
+    B32 auto_pop;
+  } parent_stack;
+
+} UI_State;
+
 // TODO move to .c file
 
 thread_local UI_State* ui_state = 0;
@@ -65,10 +78,14 @@ thread_local UI_State* ui_state = 0;
 //   return state->name_lower##_stack.top->v;
 
 UI_Box*
-ui_top_parent(){return ui_state -> }
+ui_top_parent() {
+  return ui_state->parent_stack.top->v;
+}
 
-UI_Box* ui_build_box_from_string(UI_BoxFlags flags, String8 string) {
+UI_Box*
+ui_build_box_from_string(String8 str, UI_BoxFlags flags) {
   UI_Box* parent = ui_top_parent();
+  UI_Key key = ui_key_from_string(ui)
 }
 
 // UI_Signal

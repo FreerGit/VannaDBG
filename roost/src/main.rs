@@ -1,5 +1,5 @@
-use eframe::egui;
-use egui::{viewport, Align, Layout, ViewportBuilder};
+use eframe::{egui, NativeOptions};
+use egui::{vec2, viewport, Align, Layout, Rect, Resize, Sense, Vec2, ViewportBuilder};
 use nix::{
     libc::{
         c_char, c_ulong, execl, fork, perror, personality, ptrace, waitpid, ADDR_NO_RANDOMIZE,
@@ -100,20 +100,26 @@ fn main() {
     //     println!("done: {:#x} in {:?}", base, t2);
     //     unsafe { waitpid(pid, status, 0) };
     // }
-    let mut wp = ViewportBuilder {
+    let wp = ViewportBuilder {
+        decorations: Some(false),
+        resizable: Some(true),
+        // inner_size: Some(vec2(800.0, 600.0)),
         ..Default::default()
     };
-    wp = wp.with_decorations(false);
+    // wp = wp.with_decorations(false);
+    // wp.with_resizable(true);
+    // wp.resizable(true);
     let native_options = eframe::NativeOptions {
         viewport: wp,
+
         ..Default::default()
     };
-
     eframe::run_native(
         "My egui App",
         native_options,
         Box::new(|cc| Ok(Box::new(MyEguiApp::new(cc)))),
-    );
+    )
+    .unwrap();
 }
 
 // #[derive(Default)]
@@ -131,6 +137,7 @@ fn main() {
 
 // #[derive(Default)]
 struct MyEguiApp {
+    position: Option<Vec2>,
     is_fullscreen: bool,
     last_update: Instant,
     fps: f32,
@@ -140,6 +147,7 @@ impl MyEguiApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // Customize egui here if needed
         Self {
+            position: None,
             is_fullscreen: false,
             last_update: Instant::now(),
             fps: 0.0,
@@ -149,34 +157,67 @@ impl MyEguiApp {
 
 impl eframe::App for MyEguiApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+        // frame.
         // Calculate FPS
         let now = Instant::now();
         let delta_time = now.duration_since(self.last_update);
         self.last_update = now;
         self.fps = 1.0 / delta_time.as_secs_f32();
 
-        if ctx.input(|i| i.viewport().close_requested()) {
-            // ctx.
-        }
+        // Do not love this.
+        // if self.position == vec2(0.0, 0.0) {
+        //     self.position = ctx.screen_rect().min.to_vec2();
+        //     println!("{:?}", self.position);
+        // }
 
-        egui::TopBottomPanel::top("A panel").show(ctx, |ui| {
-            ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
-                if ui.button("❌").clicked() {
-                    ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
-                }
+        egui::TopBottomPanel::top("A panel")
+            .frame(egui::Frame::none().fill(egui::Color32::from_rgb(60, 60, 60)))
+            .show(ctx, |ui| {
+                ctx.input(|i| {
+                    if self.position.is_none() {
+                        let screen_pos = i.viewport().outer_rect.map(|r| r.min.to_vec2());
+                        if screen_pos != Some(vec2(0., 0.)) {
+                            self.position = i.viewport().outer_rect.map(|r| r.min.to_vec2());
+                        }
+                    }
+                });
 
-                let fullscreen_button = if self.is_fullscreen { "🔲" } else { "🗖" };
-                if ui.button(fullscreen_button).clicked() {
-                    self.is_fullscreen = !self.is_fullscreen;
-                    ui.ctx()
-                        .send_viewport_cmd(egui::ViewportCommand::Fullscreen(self.is_fullscreen));
+                if self.position.is_some() {
+                    let panel_rect =
+                        Rect::from_min_size(self.position.unwrap().to_pos2(), vec2(200.0, 40.0));
+
+                    let response = ui.interact(panel_rect, ui.id(), Sense::drag());
+
+                    if response.dragged() {
+                        let drag_d = response.drag_delta();
+
+                        self.position = self.position.map(|r| r + drag_d);
+                        println!("{:?} {:?}", self.position, drag_d);
+
+                        // ctx.send_viewport_cmd(egui::ViewportCommand::OuterPosition(
+                        //     self.position.unwrap().to_pos2(), // frame.info().window_pos.unwrap_or_default() + delta,
+                        // ));
+                    }
                 }
-                if ui.button("🗕").clicked() {
-                    ui.ctx()
-                        .send_viewport_cmd(egui::ViewportCommand::Minimized(true));
-                }
+                ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
+                    if ui.button("❌").clicked() {
+                        ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
+
+                    let fullscreen_button = if self.is_fullscreen { "🔲" } else { "🗖" };
+                    if ui.button(fullscreen_button).clicked() {
+                        self.is_fullscreen = !self.is_fullscreen;
+                        ui.ctx()
+                            .send_viewport_cmd(egui::ViewportCommand::Fullscreen(
+                                self.is_fullscreen,
+                            ));
+                    }
+                    if ui.button("🗕").clicked() {
+                        ui.ctx()
+                            .send_viewport_cmd(egui::ViewportCommand::Minimized(true));
+                    }
+                });
             });
-        });
 
         // Egui panel for UI
         egui::CentralPanel::default().show(ctx, |ui| {
