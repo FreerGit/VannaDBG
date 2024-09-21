@@ -1,45 +1,32 @@
 extern crate gl;
 extern crate glfw;
 
+pub mod df;
+pub mod ui;
+
+use df::df_gfx::DFWindow;
 use glfw::{Action, Context, Key};
 
 fn main() {
-    let mut glfw = glfw::init_no_callbacks().unwrap();
+    let mut window = DFWindow::new();
 
-    // Request OpenGL 3.3 @TODO bump this?
-    glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-        glfw::OpenGlProfileHint::Core,
-    ));
-
-    let (mut window, events) = glfw
-        .create_window(800, 600, "Hello this is window", glfw::WindowMode::Windowed)
-        .expect("Failed to create GLFW window.");
-
-    window.set_decorated(false);
-    window.set_key_polling(true);
-    window.make_current();
-    glfw.set_swap_interval(glfw::SwapInterval::None);
-
-    gl::load_with(|s| window.get_proc_address(s) as *const _);
-
-    let mut previous_time = glfw.get_time();
+    let mut previous_time = window.glfw_object.get_time();
     let mut frame_count = 0;
 
-    while !window.should_close() {
-        glfw.poll_events();
-        for (_, event) in glfw::flush_messages(&events) {
-            handle_window_event(&mut window, event);
+    while !window.handle.should_close() {
+        window.glfw_object.poll_events();
+        for (_, event) in glfw::flush_messages(&window.event_stream) {
+            handle_window_event(&mut window.handle, event);
         }
 
         unsafe {
             gl::ClearColor(0., 0., 0., 1.);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
-        window.swap_buffers();
+        window.handle.swap_buffers();
 
         // Calculate FPS
-        let current_time = glfw.get_time();
+        let current_time = window.glfw_object.get_time();
         frame_count += 1;
 
         // Print FPS every second
