@@ -2,10 +2,13 @@ extern crate gl;
 extern crate glfw;
 
 pub mod df;
+pub mod render;
 pub mod ui;
 
 use df::df_gfx::DFWindow;
+use glam::Vec2;
 use glfw::{Action, Context, Key};
+use render::render::{r_rect, r_triangle, Color4, Corner2};
 
 fn main() {
     let mut window = DFWindow::new();
@@ -23,6 +26,39 @@ fn main() {
             gl::ClearColor(0., 0., 0., 1.);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
+
+        // Define a rectangle and color
+        let rect = Corner2 {
+            min: Vec2::new(0., 0.),
+            max: Vec2::new(200., 200.),
+        };
+        let color = Color4 {
+            r: 1.0,
+            g: 0.3,
+            b: 0.5,
+            a: 1.0,
+        }; // Red color
+
+        // Draw the rectangle
+        // unsafe {
+        //     gl::BindVertexArray(window.vao);
+        // }
+        // r_rect(&window, rect, color);
+
+        // Use the simple shaders
+        unsafe {
+            gl::UseProgram(window.shader_program); // Replace with your shader program
+        }
+
+        // Draw the triangle
+        r_triangle();
+
+        // Check for OpenGL errors
+        let error = unsafe { gl::GetError() };
+        if error != gl::NO_ERROR {
+            eprintln!("OpenGL Error: {}", error);
+        }
+
         window.handle.swap_buffers();
 
         // Calculate FPS
