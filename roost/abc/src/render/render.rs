@@ -50,8 +50,8 @@ pub fn r_rect(window: &DFWindow, rect: Corner2, color: Color4) {
     #[rustfmt::skip]
     let vertices: [f32; 20] = [
         // Positions          // Colors
-        rect.x0(), rect.y0(), color.r, color.g, color.b // Bottom left
-        ,rect.x1(), rect.y0(), color.r, color.g, color.b, // Bottom right
+        rect.x0(), rect.y0(), color.r, color.g, color.b, // Bottom left
+        rect.x1(), rect.y0(), color.r, color.g, color.b, // Bottom right
         rect.x1(), rect.y1(), color.r, color.g, color.b, // Top right
         rect.x0(), rect.y1(), color.r, color.g, color.b, // Top left
     ];
@@ -63,11 +63,10 @@ pub fn r_rect(window: &DFWindow, rect: Corner2, color: Color4) {
 
     let mut vbo: u32 = 0;
     let mut ebo: u32 = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut vbo);
-        gl::GenBuffers(1, &mut ebo);
 
+    unsafe {
         // Bind and set vertex buffer data
+        gl::GenBuffers(1, &mut vbo);
         gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
         gl::BufferData(
             gl::ARRAY_BUFFER,
@@ -76,7 +75,8 @@ pub fn r_rect(window: &DFWindow, rect: Corner2, color: Color4) {
             gl::STATIC_DRAW,
         );
 
-        // Bind and set element buffer data
+        // Generate and bind the element buffer
+        gl::GenBuffers(1, &mut ebo);
         gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
         gl::BufferData(
             gl::ELEMENT_ARRAY_BUFFER,
@@ -86,13 +86,35 @@ pub fn r_rect(window: &DFWindow, rect: Corner2, color: Color4) {
         );
 
         // Use the shader program
-        gl::UseProgram(window.shader_program); // Pass shader program here
-        gl::BindVertexArray(window.vao); // Ensure the VAO is bound
+        gl::UseProgram(window.shader_program); // Ensure to use the correct shader program
+        gl::BindVertexArray(window.vao); // Ensure the correct VAO is bound
+
+        // Set vertex attribute pointers if they aren't already set
+        // Assuming position is at location 0 and color is at location 1
+        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(
+            0,
+            2,
+            gl::FLOAT,
+            gl::FALSE,
+            5 * std::mem::size_of::<f32>() as i32,
+            std::ptr::null(),
+        );
+
+        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(
+            1,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            5 * std::mem::size_of::<f32>() as i32,
+            (2 * std::mem::size_of::<f32>()) as *const _,
+        );
 
         // Draw the rectangle
         gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, std::ptr::null());
 
-        // Cleanup
+        // Cleanup (only delete EBO here, VBO will be deleted when necessary)
         gl::BindBuffer(gl::ARRAY_BUFFER, 0);
         gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, 0);
         gl::DeleteBuffers(1, &vbo);

@@ -30,12 +30,12 @@ fn main() {
         // Define a rectangle and color
         let rect = Corner2 {
             min: Vec2::new(0., 0.),
-            max: Vec2::new(200., 200.),
+            max: Vec2::new(0.5, 0.5),
         };
         let color = Color4 {
             r: 1.0,
             g: 0.3,
-            b: 0.5,
+            b: 0.0,
             a: 1.0,
         }; // Red color
 
@@ -43,15 +43,15 @@ fn main() {
         // unsafe {
         //     gl::BindVertexArray(window.vao);
         // }
-        // r_rect(&window, rect, color);
 
         // Use the simple shaders
         unsafe {
             gl::UseProgram(window.shader_program); // Replace with your shader program
         }
 
+        r_rect(&window, rect, color);
         // Draw the triangle
-        r_triangle();
+        // r_triangle();
 
         // Check for OpenGL errors
         let error = unsafe { gl::GetError() };
