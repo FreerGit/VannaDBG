@@ -8,7 +8,8 @@ pub mod ui;
 use df::df_gfx::DFWindow;
 use glam::Vec2;
 use glfw::{Action, Context, Key};
-use render::render::{r_rect, Color4, Corner2};
+use render::render::{r_rect, r_rect_batch, Color4, Corner2};
+use timing_rdtsc::{timing, timing_return};
 use ui::ui_core::{UIBox, UIBoxFlag, UIState};
 
 fn main() {
@@ -58,24 +59,7 @@ fn main() {
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
 
-        // Define a rectangle and color
-        let rect = Corner2 {
-            min: Vec2::new(0., 0.),
-            max: Vec2::new(0.5, 0.5),
-        };
-        let color = Color4 {
-            r: 1.0,
-            g: 0.3,
-            b: 0.0,
-            a: 1.0,
-        };
-
-        // r_rect(&window, rect, color);
-        //
         render_ui(&window, &ui_state);
-
-        // Draw the triangle
-        // r_triangle();
 
         // Check for OpenGL errors
         let error = unsafe { gl::GetError() };
@@ -119,14 +103,16 @@ fn render_ui(window: &DFWindow, ui_state: &UIState) {
         )
     };
 
+    let mut rects: Vec<(Corner2, Color4)> = Vec::new();
+
     if let Some(root) = &ui_state.root {
         // Convert position and size of root panel to OpenGL coordinates
+
         let root_min = map_to_gl_coords(root.fixed_pos);
         let root_max = map_to_gl_coords(root.fixed_pos + root.fixed_size);
 
         // Render the root panel
-        r_rect(
-            window,
+        rects.push((
             Corner2 {
                 min: root_min,
                 max: root_max,
@@ -137,14 +123,13 @@ fn render_ui(window: &DFWindow, ui_state: &UIState) {
                 b: 0.8,
                 a: 1.0,
             },
-        );
+        ));
 
         // Render the first child panel
         if let Some(first_child) = &root.first_child {
             let first_min = map_to_gl_coords(first_child.fixed_pos);
             let first_max = map_to_gl_coords(first_child.fixed_pos + first_child.fixed_size);
-            r_rect(
-                window,
+            rects.push((
                 Corner2 {
                     min: first_min,
                     max: first_max,
@@ -155,15 +140,14 @@ fn render_ui(window: &DFWindow, ui_state: &UIState) {
                     b: 0.5,
                     a: 1.0,
                 },
-            );
+            ));
         }
 
         // Render the last child panel
         if let Some(last_child) = &root.last_child {
             let last_min = map_to_gl_coords(last_child.fixed_pos);
             let last_max = map_to_gl_coords(last_child.fixed_pos + last_child.fixed_size);
-            r_rect(
-                window,
+            rects.push((
                 Corner2 {
                     min: last_min,
                     max: last_max,
@@ -174,7 +158,9 @@ fn render_ui(window: &DFWindow, ui_state: &UIState) {
                     b: 0.5,
                     a: 1.0,
                 },
-            );
+            ));
         }
     }
+
+    r_rect_batch(window, &rects.as_slice());
 }
