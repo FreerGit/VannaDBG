@@ -7,10 +7,10 @@ pub mod ui;
 
 use df::df_gfx::DFWindow;
 use glam::Vec2;
-use glfw::{Action, Context, Key};
+use glfw::{Action, Context, Key, WindowHint};
 use render::render::{r_rect, r_rect_batch, Color4, Corner2};
 use timing_rdtsc::{timing, timing_return};
-use ui::ui_core::{UIBox, UIBoxFlag, UIState};
+use ui::ui_core::{Axis, SemanticSize, UIBox, UIBoxFlag, UISize, UIState};
 
 fn main() {
     let mut window = DFWindow::new();
@@ -21,32 +21,60 @@ fn main() {
     let mut ui_state = UIState::default();
     let mut root_panel = Box::new(UIBox {
         fixed_pos: Vec2::new(0., 0.),
-        fixed_size: Vec2::new(800., 600.),
+        x_axis: UISize {
+            size_type: SemanticSize::PercentOfParent(1.),
+            strictness: 1.0,
+        },
+        y_axis: UISize {
+            size_type: SemanticSize::PercentOfParent(1.),
+            strictness: 1.,
+        },
         flags: UIBoxFlag::UI_BoxFlag_Clickable,
+        child_layout_axis: Axis::X,
         ..Default::default()
     });
 
     // Create the first panel
     let first_panel = Box::new(UIBox {
-        fixed_pos: Vec2::new(50.0, 50.0),    // Position of the first panel
-        fixed_size: Vec2::new(300.0, 200.0), // Size of the first panel
+        fixed_pos: Vec2::new(0., 0.),
+        x_axis: UISize {
+            size_type: SemanticSize::PercentOfParent(0.5),
+            strictness: 1.0,
+        },
+        y_axis: UISize {
+            size_type: SemanticSize::PercentOfParent(1.),
+            strictness: 1.,
+        },
         flags: UIBoxFlag::UI_BoxFlag_Clickable,
         ..Default::default()
     });
 
-    // Create the second panel
+    // // Create the second panel
     let second_panel = Box::new(UIBox {
-        fixed_pos: Vec2::new(400.0, 50.0),   // Position of the second panel
-        fixed_size: Vec2::new(300.0, 200.0), // Size of the second panel
+        fixed_pos: Vec2::new(0., 0.),
+        x_axis: UISize {
+            size_type: SemanticSize::PercentOfParent(0.5),
+            strictness: 1.0,
+        },
+        y_axis: UISize {
+            size_type: SemanticSize::PercentOfParent(1.),
+            strictness: 1.,
+        },
         flags: UIBoxFlag::UI_BoxFlag_Clickable,
         ..Default::default()
     });
 
-    root_panel.first_child = Some(first_panel);
-    root_panel.last_child = Some(second_panel);
+    root_panel.first = Some(first_panel);
+    root_panel.last = Some(second_panel);
+    root_panel.first.unwrap().next = root_panel.last;
     root_panel.child_count = 2;
 
     ui_state.root = Some(root_panel);
+
+    if let Some(mut root) = ui_state.root.take() {
+        ui_state.calculate_layout(&mut root, Vec2::new(800., 600.)); // Assuming the window is 800x600
+        ui_state.root = Some(root);
+    }
 
     while !window.handle.should_close() {
         window.glfw_object.poll_events();
@@ -58,6 +86,7 @@ fn main() {
             gl::ClearColor(0., 0., 0., 1.);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
+        // println!("{:?}", ui_state.root);
 
         render_ui(&window, &ui_state);
 
@@ -104,62 +133,37 @@ fn render_ui(window: &DFWindow, ui_state: &UIState) {
     };
 
     let mut rects: Vec<(Corner2, Color4)> = Vec::new();
-
     if let Some(root) = &ui_state.root {
         // Convert position and size of root panel to OpenGL coordinates
-
         let root_min = map_to_gl_coords(root.fixed_pos);
         let root_max = map_to_gl_coords(root.fixed_pos + root.fixed_size);
 
-        // Render the root panel
+        // Store the root panel rectangle
         rects.push((
-            Corner2 {
-                min: root_min,
-                max: root_max,
-            },
-            Color4 {
-                r: 0.2,
-                g: 0.5,
-                b: 0.8,
-                a: 1.0,
-            },
-        ));
+            Corner2::new(root_min, root_max),
+            Color4::new(1.0, 0.0, 0., 1.0),
+        )); // Example color
 
-        // Render the first child panel
-        if let Some(first_child) = &root.first_child {
-            let first_min = map_to_gl_coords(first_child.fixed_pos);
-            let first_max = map_to_gl_coords(first_child.fixed_pos + first_child.fixed_size);
-            rects.push((
-                Corner2 {
-                    min: first_min,
-                    max: first_max,
-                },
-                Color4 {
-                    r: 0.8,
-                    g: 0.3,
-                    b: 0.5,
-                    a: 1.0,
-                },
-            ));
-        }
+        // Iterate over child panels
+        let mut child = root.first.as_deref();
+        while let Some(child_panel) = child {
+            println!("C");
+            let child_min = map_to_gl_coords(child_panel.fixed_pos + root.fixed_pos); // Position relative to root
+            let child_max =
+                map_to_gl_coords(child_panel.fixed_pos + root.fixed_pos + child_panel.fixed_size); // Size relative to root
 
-        // Render the last child panel
-        if let Some(last_child) = &root.last_child {
-            let last_min = map_to_gl_coords(last_child.fixed_pos);
-            let last_max = map_to_gl_coords(last_child.fixed_pos + last_child.fixed_size);
+            // Store the child panel rectangle
             rects.push((
-                Corner2 {
-                    min: last_min,
-                    max: last_max,
-                },
-                Color4 {
-                    r: 0.3,
-                    g: 0.8,
-                    b: 0.5,
-                    a: 1.0,
-                },
-            ));
+                Corner2::new(child_min, child_max),
+                Color4::new(0., 1.0, 0.0, 1.0),
+            )); // Example color
+
+            child = child_panel.next.as_deref(); // Move to the next sibling
         }
+    }
+
+    for (i, c) in rects.iter().enumerate() {
+        println!("{} {:?}", i, c.0);
     }
 
     r_rect_batch(window, &rects.as_slice());

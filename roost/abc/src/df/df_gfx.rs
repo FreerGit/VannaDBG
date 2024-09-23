@@ -27,7 +27,7 @@ pub struct DFWindow {
 #[derive(Default)]
 pub struct DFPanel {
     // Tree links/data
-    pub first_child: Option<Box<UIBox>>,
+    pub first_child: Option<Rc<UIBox>>,
     pub last_child: Option<Box<UIBox>>,
     pub next_sibling: Option<Box<UIBox>>,
     pub prev_sibling: Option<Box<UIBox>>,
@@ -48,10 +48,13 @@ impl DFWindow {
         ));
 
         let (mut window, events) = glfw
-            .create_window(800, 600, "Hello this is window", glfw::WindowMode::Windowed)
+            .create_window(800, 600, "", glfw::WindowMode::Windowed)
             .expect("Failed to create GLFW window.");
 
         window.set_decorated(false);
+        // TODO the initializer seem to account for the title bar, which we remove with decoreted
+        window.set_size(800, 600);
+
         window.set_key_polling(true);
 
         window.make_current(); // TODO this should be dynamic
@@ -60,8 +63,7 @@ impl DFWindow {
 
         gl::load_with(|s| window.get_proc_address(s) as *const _);
 
-        // Set up shaders
-
+        // TODO this should be moved to render layer
         let shader_program = setup_shaders();
 
         let mut vao: u32 = 0;

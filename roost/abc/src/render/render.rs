@@ -15,7 +15,17 @@ pub struct Color4 {
     pub a: f32,
 }
 
+impl Color4 {
+    pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Color4 { r, g, b, a }
+    }
+}
+
 impl Corner2 {
+    pub fn new(min: Vec2, max: Vec2) -> Self {
+        Corner2 { min, max }
+    }
+
     fn p0(&self) -> Vec2 {
         self.min
     }
