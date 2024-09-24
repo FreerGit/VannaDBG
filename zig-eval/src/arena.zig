@@ -1,51 +1,114 @@
-// #include "base.h"
+const std = @import("std");
+const assert = std.debug.assert;
+const os = std.os.linux;
+const mem = std.mem;
 
-// #ifndef BASE_ARENA_H
-// #define BASE_ARENA_H
+pub const VirtualArena = struct {
+    base: []align(std.mem.page_size) u8,
+    offset: usize,
+    capacity: usize,
 
-// typedef struct {
-//   U64 *base;
-//   U64  offset;
-//   U64  capacity;
-// } Arena;
+    const Self = @This();
 
-// typedef struct {
-//   Arena *arena;
-//   U64    offset;
-// } Scratch;
+    // This is the `Allocator` interface
+    // "In zig you can easily implement custom allocators!!!"
+    // But no way in hell will we show any example or document it for you :)))
+    // DOGWATER
+    // AND ALSO WHAT IN THE ACTUAL FUCKITY FUUUCK IS THE API FOR STD.OS/STD.POSIX HOOOOLY SHIT
+    const vtable = std.mem.Allocator.VTable{
+        .alloc = _alloc,
+        .resize = resize,
+        .free = free,
+    };
 
-// // Arena creation/destruction
+    pub fn init(capacity: usize) !Self {
+        const aligned_capacity = mem.alignForward(usize, capacity, std.mem.page_size);
+        const base = try std.posix.mmap(
+            null,
+            aligned_capacity,
+            os.PROT.READ | os.PROT.WRITE,
+            .{ .TYPE = .PRIVATE, .ANONYMOUS = true },
+            -1,
+            0,
+        );
 
-// static inline Arena
-// arena_alloc(U64 capacity);
+        return VirtualArena{
+            .base = base,
+            .offset = 0,
+            .capacity = aligned_capacity,
+        };
+    }
 
-// static inline void
-// arena_release(Arena *arena);
+    pub fn allocator(self: *Self) std.mem.Allocator {
+        return .{
+            .ptr = self,
+            .vtable = &vtable,
+        };
+    }
 
-// // Arena core functions
-// static inline void *
-// arena_push(Arena *arena, U64 size);
+    pub fn pos(self: *Self) usize {
+        return self.offset;
+    }
 
-// static inline U64
-// arena_pos(Arena *arena);
+    pub fn alloc(self: *Self, comptime T: type, n: usize) ![]T {
+        return try self.allocator().alloc(T, n);
+    }
 
-// // Arena offset functions
-// static inline void
-// arena_reset(Arena *arena);
+    pub fn allocAlign(self: *Self, comptime T: type, n: usize) ![]T {
+        return try self.allocator().alignedAlloc(T, @alignOf(T), n);
+    }
 
-// static inline void
-// arena_pop(Arena *arena, U64 amount);
+    pub fn deinit(self: *Self) void {
+        _ = std.posix.munmap(self.base);
+    }
 
-// static inline void
-// arena_pop_to(Arena *arena, U64 pos);
+    pub fn reset(self: *Self) void {
+        self.offset = 0;
+    }
 
-// // Scratch arenas (temporary arenas)
-// static inline Scratch
-// arena_scratch_begin(Arena *arena);
+    // Interface fn's
+    fn _alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
+        _ = ret_addr;
 
-// static inline void
-// arena_scratch_end(Scratch scratch_arena);
+        const self: *Self = @ptrCast(@alignCast(ctx));
+        const alignment = @max(ptr_align, @alignOf(usize));
+        const aligned_offset = mem.alignForward(usize, self.offset, alignment);
+        const new_offset = aligned_offset + len;
 
-// #endif  // BASE_ARENA_H
+        if (new_offset > self.capacity) {
+            return null;
+        }
 
+        const result = self.base.ptr + aligned_offset;
+        self.offset = new_offset;
+        return result;
+    }
 
+    fn resize(ctx: *anyopaque, buf: []u8, buf_align: u8, new_len: usize, ret_addr: usize) bool {
+        _ = buf_align;
+        _ = ret_addr;
+        const self = @as(*Self, @ptrCast(@alignCast(ctx)));
+        if (@intFromPtr(buf.ptr) + new_len > @intFromPtr(self.base.ptr) + self.offset) {
+            return false;
+        }
+        return new_len <= buf.len;
+    }
+
+    // No-op: Arena doesn't free individual allocations
+    fn free(_: *anyopaque, _: []u8, _: u8, _: usize) void {}
+};
+
+pub const Scratch = struct {
+    arena: *VirtualArena,
+    offset: usize,
+
+    pub fn begin(arena: *VirtualArena) Scratch {
+        return .{ .arena = arena, .offset = arena.pos() };
+    }
+
+    pub fn end(self: Scratch) void {
+        // popTo function, just "call" reset on the sub-arena
+        assert(self.offset <= self.arena.offset);
+        self.arena.offset = self.offset;
+    }
+};
