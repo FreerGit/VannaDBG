@@ -65,20 +65,34 @@ pub fn sllQueuePop(
     }
 }
 
-pub fn dllInsert(comptime DLL: type, comptime Node: type, dll: *?*DLL, node: *Node) void {
+pub fn dllInsert(comptime DLL: type, comptime Node: type, dll: *?*DLL, prev: ?*Node, node: *Node) void {
     if (dll.*.?.first == null) { // Empty list
         dll.*.?.first = node;
         dll.*.?.last = node;
-        node.next = null;
         node.prev = null;
-    } else {
-        if (dll.*.?.last != null) {
-            dll.*.?.last.?.*.next = node;
-        }
-        node.prev = dll.*.?.last;
         node.next = null;
-        dll.*.?.last = node;
+    } else if (prev == null) { // Push front
+        node.next = dll.*.?.first;
+        dll.*.?.first.?.*.prev = node;
+        dll.*.?.first.? = node;
+        node.prev = null;
+    } else { // Insertion or push back
+        node.prev = prev;
+        node.next = prev.?.next;
+        if (prev.?.next != null) {
+            prev.?.next.?.*.prev = node;
+        } else {
+            dll.*.?.last = node;
+        }
+        prev.?.next = node;
     }
+}
+pub fn dllPushBack(comptime DLL: type, comptime Node: type, dll: *?*DLL, node: *Node) void {
+    dllInsert(DLL, Node, dll, dll.*.?.last, node);
+}
+
+pub fn dllPushFront(comptime DLL: type, comptime Node: type, dll: *?*DLL, node: *Node) void {
+    dllInsert(DLL, Node, dll, null, node);
 }
 
 pub fn dllRemove(comptime DLL: type, comptime Node: type, dll: *?*DLL, node: *Node) void {
@@ -171,7 +185,7 @@ test "singly-linked, doubly-headed queue" {
     try t.expect(root.?.first == root.?.last);
 }
 
-test "doubly-linked" {
+test "doubly-linked insert/remove" {
     const Node = struct {
         value: i32,
         prev: ?*@This() = null,
@@ -194,11 +208,10 @@ test "doubly-linked" {
     var node3 = try arena.allocPtrZero(Node);
     node3.value = 3;
 
-    dllInsert(DLL, Node, &dll, node1); // Insert first node
-    dllInsert(DLL, Node, &dll, node2); // Insert second node
-    dllInsert(DLL, Node, &dll, node3); // Insert third node
+    dllInsert(DLL, Node, &dll, dll.?.last.?, node1);
+    dllInsert(DLL, Node, &dll, dll.?.last.?, node2);
+    dllInsert(DLL, Node, &dll, dll.?.last.?, node3);
 
-    // Traverse the list and print node values
     var current = dll.?.first;
     var v: u32 = 1;
     while (current != null) : (current = current.?.*.next) {
@@ -213,4 +226,50 @@ test "doubly-linked" {
     try t.expect(dll.?.first.?.value == 1);
     try t.expect(dll.?.first.?.next == null);
     try t.expect(dll.?.first == dll.?.last);
+    dllRemove(DLL, Node, &dll, node1);
+    try t.expect(dll.?.first == null);
+    try t.expect(dll.?.last == null);
+}
+
+test "doubly-linked push" {
+    const Node = struct {
+        value: i32,
+        prev: ?*@This() = null,
+        next: ?*@This() = null,
+    };
+    const DLL = struct {
+        first: ?*Node = null,
+        last: ?*Node = null,
+    };
+    var arena = try VirtualArena.init(1024 * 1024);
+    defer arena.deinit();
+
+    var dll: ?*DLL = try arena.allocPtrZero(DLL);
+
+    for (0..10) |i| {
+        const node = try arena.allocPtrZero(Node);
+        node.value = @intCast(i);
+        dllPushBack(DLL, Node, &dll, node);
+    }
+
+    for (0..10) |i| {
+        const node = try arena.allocPtrZero(Node);
+        node.value = @intCast(i);
+        dllPushFront(DLL, Node, &dll, node);
+    }
+
+    var current = dll.?.first;
+    var i: usize = 9;
+    while (current) |n| {
+        try t.expect(n.value == i);
+        current = n.next;
+        if (i == 0) break;
+        i -= 1;
+    }
+
+    while (current) |n| {
+        try t.expect(n.value == i);
+        current = n.next;
+        i += 1;
+    }
 }

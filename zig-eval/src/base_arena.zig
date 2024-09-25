@@ -11,10 +11,6 @@ pub const VirtualArena = struct {
     const Self = @This();
 
     // This is the `Allocator` interface
-    // "In zig you can easily implement custom allocators!!!"
-    // But no way in hell will we show any example or document it for you :)))
-    // DOGWATER
-    // AND ALSO WHAT IN THE ACTUAL FUCKITY FUUUCK IS THE API FOR STD.OS/STD.POSIX HOOOOLY SHIT
     const vtable = std.mem.Allocator.VTable{
         .alloc = _alloc,
         .resize = resize,
@@ -73,7 +69,7 @@ pub const VirtualArena = struct {
     }
 
     pub fn deinit(self: *Self) void {
-        _ = std.posix.munmap(self.base);
+        std.posix.munmap(self.base);
     }
 
     pub fn reset(self: *Self) void {
