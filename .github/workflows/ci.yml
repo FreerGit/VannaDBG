@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-c:
     runs-on: ubuntu-latest
     container: gcc:13
     steps:
@@ -35,3 +35,18 @@ jobs:
     - name: Run tests
       run:
         ./workflow.sh test
+  build-zig:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+  
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.13.0
+      - name: Build
+        run: cd zig-eval && zig build
+      - name: Tests
+        run: cd zig-eval && zig build test
+  

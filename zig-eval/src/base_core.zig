@@ -208,9 +208,9 @@ test "doubly-linked insert/remove" {
     var node3 = try arena.allocPtrZero(Node);
     node3.value = 3;
 
-    dllInsert(DLL, Node, &dll, dll.?.last.?, node1);
-    dllInsert(DLL, Node, &dll, dll.?.last.?, node2);
-    dllInsert(DLL, Node, &dll, dll.?.last.?, node3);
+    dllInsert(DLL, Node, &dll, dll.?.last, node1);
+    dllInsert(DLL, Node, &dll, dll.?.last, node2);
+    dllInsert(DLL, Node, &dll, dll.?.last, node3);
 
     var current = dll.?.first;
     var v: u32 = 1;
