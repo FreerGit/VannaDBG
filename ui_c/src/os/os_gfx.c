@@ -1,25 +1,31 @@
 #include "os_gfx.h"
 
-#include <GLFW/glfw3.h>
 #include <assert.h>
 
 void
 os_gfx_init() {
   assert(glfwInit());
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
 Window
 os_window_open(Vec2F32 resolution, String8 title) {
   glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
   GLFWwindow* window = glfwCreateWindow(resolution.x, resolution.y,
                                         (const char*)title.str, NULL, NULL);
   if (!window) {
     glfwTerminate();
     assert(window && "Could not create window");
   }
-
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  glfwSwapInterval(0);
+
+  glewExperimental = GL_TRUE;
+  assert(glewInit() == GLEW_OK && "Could not create glew bindings");
+
   return (Window){.handle = window};
 }
 
