@@ -4,15 +4,6 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // const lib = b.addStaticLibrary(.{
-    //     .name = "zig-eval",
-    //     .root_source_file = b.path("src/root.zig"),
-    //     .target = target,
-    //     .optimize = optimize,
-    // });
-
-    // b.installArtifact(lib);
-
     const exe = b.addExecutable(.{
         .name = "zig-eval",
         .root_source_file = b.path("src/main.zig"),
@@ -30,9 +21,6 @@ pub fn build(b: *std.Build) void {
     });
     exe.linkSystemLibrary("glfw");
     exe.linkSystemLibrary("dl");
-    // exe.linkSystemLibrary("GLEW");
-    // exe.linkSystemLibrary("GL");
-    // exe.linkSystemLibrary("m");
 
     b.installArtifact(exe);
 
@@ -46,7 +34,11 @@ pub fn build(b: *std.Build) void {
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
 
-    const tests = b.addTest(.{ .optimize = optimize, .root_source_file = b.path("src/tests.zig"), .test_runner = b.path("src/test_runner.zig") });
+    const tests = b.addTest(.{
+        .optimize = optimize,
+        .root_source_file = b.path("src/tests.zig"),
+        .test_runner = b.path("src/test_runner.zig"),
+    });
 
     const run_lib_unit_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run all tests");

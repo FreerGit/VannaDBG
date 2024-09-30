@@ -61,8 +61,4 @@ pub fn main() !void {
         c.glfwSwapBuffers(@ptrCast(window.handle));
         c.glfwPollEvents();
     }
-
-    // Clean up
-    // c.glDeleteVertexArrays(1, &VAO);
-    // c.glDeleteBuffers(1, &VBO);
 }

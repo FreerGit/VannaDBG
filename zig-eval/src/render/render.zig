@@ -3,11 +3,11 @@ const assert = std.debug.assert;
 const c = @cImport({
     @cInclude("glad.h");
     @cInclude("GLFW/glfw3.h");
-    // @cInclude("GL/gl.h");
 });
 
 const R_Context = struct {
-    VBO: u32,
+    vert_VBO: u32,
+    color_VBO: u32,
     VAO: u32,
     shader_program: u32,
 };
@@ -40,6 +40,7 @@ pub fn init() R_Context {
     // Build and compile the vertex shader
     var success: c.GLint = 0;
 
+    // Build and compile the vertex shader
     const vertex_shader = c.glCreateShader(c.GL_VERTEX_SHADER);
     const vss = [_][*c]const u8{vertex_shader_source};
     c.glShaderSource(vertex_shader, 1, &vss, null);
@@ -61,24 +62,31 @@ pub fn init() R_Context {
     c.glAttachShader(shader_program, fragment_shader);
     c.glLinkProgram(shader_program);
     c.glGetProgramiv(shader_program, c.GL_LINK_STATUS, &success);
+    assert(success == c.GL_TRUE);
 
     // We can safely remove them after the linking
     c.glDeleteShader(vertex_shader);
     c.glDeleteShader(fragment_shader);
 
     ctx.shader_program = shader_program;
+    // Create VAO and VBOs
     c.glGenVertexArrays(1, &ctx.VAO);
-    c.glGenBuffers(1, &ctx.VBO);
+    c.glGenBuffers(1, &ctx.vert_VBO);
+    c.glGenBuffers(1, &ctx.color_VBO);
 
     c.glBindVertexArray(ctx.VAO);
-    c.glBindBuffer(c.GL_ARRAY_BUFFER, ctx.VBO);
 
-    c.glVertexAttribPointer(0, 3, c.GL_FLOAT, c.GL_FALSE, 6 * @sizeOf(f32), @ptrFromInt(0));
+    // Bind vertex buffer and set vertex attribute pointer
+    c.glBindBuffer(c.GL_ARRAY_BUFFER, ctx.vert_VBO);
+    c.glVertexAttribPointer(0, 3, c.GL_FLOAT, c.GL_FALSE, 3 * @sizeOf(f32), @ptrFromInt(0));
     c.glEnableVertexAttribArray(0);
-    c.glVertexAttribPointer(1, 3, c.GL_FLOAT, c.GL_FALSE, 6 * @sizeOf(f32), @ptrFromInt(3 * @sizeOf(f32)));
+
+    // Bind color buffer and set color attribute pointer
+    c.glBindBuffer(c.GL_ARRAY_BUFFER, ctx.color_VBO);
+    c.glVertexAttribPointer(1, 3, c.GL_FLOAT, c.GL_FALSE, 3 * @sizeOf(f32), @ptrFromInt(0));
     c.glEnableVertexAttribArray(1);
 
-    c.glBindBuffer(c.GL_ARRAY_BUFFER, 0);
+    // Unbind VAO
     c.glBindVertexArray(0);
     return ctx;
 }
@@ -91,24 +99,24 @@ pub fn render(ctx: R_Context, vertices: []const f32, colors: []const f32) void {
 
     c.glUseProgram(ctx.shader_program);
     c.glBindVertexArray(ctx.VAO);
-    c.glBindBuffer(c.GL_ARRAY_BUFFER, ctx.VBO);
-    c.glBufferData(c.GL_ARRAY_BUFFER, @intCast(vertices.len * @sizeOf(f32)), @ptrCast(vertices), c.GL_DYNAMIC_DRAW);
+    c.glBindBuffer(c.GL_ARRAY_BUFFER, ctx.vert_VBO);
+    c.glBufferData(
+        c.GL_ARRAY_BUFFER,
+        @intCast(vertices.len * @sizeOf(f32)),
+        @ptrCast(vertices),
+        c.GL_DYNAMIC_DRAW,
+    );
 
-    c.glVertexAttribPointer(0, 3, c.GL_FLOAT, c.GL_FALSE, 0, @ptrFromInt(0));
-    c.glEnableVertexAttribArray(0);
+    // c.glGenBuffers(1, &color_vbo);
+    c.glBindBuffer(c.GL_ARRAY_BUFFER, ctx.color_VBO);
+    c.glBufferData(
+        c.GL_ARRAY_BUFFER,
+        @intCast(colors.len * @sizeOf(f32)),
+        @ptrCast(colors),
+        c.GL_DYNAMIC_DRAW,
+    );
 
-    var color_vbo: u32 = 0;
-    c.glGenBuffers(1, &color_vbo);
-    c.glBindBuffer(c.GL_ARRAY_BUFFER, color_vbo);
-    c.glBufferData(c.GL_ARRAY_BUFFER, @intCast(colors.len * @sizeOf(f32)), @ptrCast(colors), c.GL_DYNAMIC_DRAW);
-
-    // Set the vertex attribute pointer for colors (location = 1)
-    c.glVertexAttribPointer(1, 3, c.GL_FLOAT, c.GL_FALSE, 0, @ptrFromInt(0));
-    c.glEnableVertexAttribArray(1);
-
-    // Draw the triangles
     c.glDrawArrays(c.GL_TRIANGLES, 0, @intCast(vertex_n));
-
     // Unbind the VAO
     c.glBindVertexArray(0);
 }
