@@ -24,12 +24,13 @@ pub fn build(b: *std.Build) void {
     exe.addCSourceFile(.{
         .file = b.path("third_party/glad.c"),
         .flags = &[_][]const u8{
-            "-O2",
+            "-O3",
             "-DNDEBUG",
         },
     });
     exe.linkSystemLibrary("glfw");
     exe.linkSystemLibrary("dl");
+    // exe.linkSystemLibrary("GLEW");
     // exe.linkSystemLibrary("GL");
     // exe.linkSystemLibrary("m");
 

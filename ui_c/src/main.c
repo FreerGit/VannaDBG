@@ -114,9 +114,9 @@ main() {
     print_fps();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Render triangle
-    render(r_handle, triangleVertices,
-           sizeof(triangleVertices) / sizeof(triangleVertices[0]));
+    // // Render triangle
+    // render(r_handle, triangleVertices,
+    //        sizeof(triangleVertices) / sizeof(triangleVertices[0]));
 
     // // Render square
     render(r_handle, squareVertices,
