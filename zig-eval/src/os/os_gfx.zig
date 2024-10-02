@@ -1,12 +1,12 @@
 const std = @import("std");
-const base = @import("../base/base.zig");
+const base = @import("../base/base_core.zig");
 const assert = std.debug.assert;
 const c = @cImport({
     @cInclude("glad.h");
     @cInclude("GLFW/glfw3.h");
 });
 
-const Window = struct {
+const OS_Window = struct {
     handle: *c.GLFWwindow,
 };
 
@@ -18,7 +18,7 @@ pub fn gfx_init() void {
     c.glfwWindowHint(c.GLFW_OPENGL_PROFILE, c.GLFW_OPENGL_CORE_PROFILE);
 }
 
-pub fn window_open(resolution: base.Vec2F32) Window {
+pub fn window_open(resolution: base.Vec2F32) OS_Window {
     c.glfwWindowHint(c.GLFW_DECORATED, c.GL_FALSE);
     const window =
         c.glfwCreateWindow(@intFromFloat(resolution.x), @intFromFloat(resolution.y), "", null, null);
@@ -28,7 +28,7 @@ pub fn window_open(resolution: base.Vec2F32) Window {
 
         assert(c.gladLoadGLLoader(@as(c.GLADloadproc, @ptrCast(&c.glfwGetProcAddress))) != 0);
 
-        return Window{ .handle = w };
+        return OS_Window{ .handle = w };
     } else {
         c.glfwTerminate();
         @panic("Could not create window");

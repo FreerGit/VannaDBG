@@ -3,6 +3,8 @@ const Scratch = @import("base_arena.zig").Scratch;
 const std = @import("std");
 const t = std.testing;
 
+// Links
+
 pub fn sllStackPush(comptime Node: type, first: **Node, node: *Node) void {
     comptime {
         if (!@hasField(Node, "next")) {
@@ -272,4 +274,52 @@ test "doubly-linked push" {
         current = n.next;
         i += 1;
     }
+}
+
+// Vectors
+
+pub const Vec2F32 = extern struct {
+    x: f32,
+    y: f32,
+
+    pub fn new(x: f32, y: f32) Vec2F32 {
+        return .{ .x = x, .y = y };
+    }
+};
+
+const RectF32 = extern union {
+    min_max: extern struct {
+        min: Vec2F32,
+        max: Vec2F32,
+    },
+    v: [2]Vec2F32,
+
+    pub fn get_corners(self: *const RectF32) [2]Vec2F32 {
+        return self.v;
+    }
+};
+
+test "RectF32 get_corners" {
+    const rect: RectF32 = .{
+        .min_max = .{
+            .min = Vec2F32.new(0.0, 0.0),
+            .max = Vec2F32.new(10.0, 10.0),
+        },
+    };
+    try t.expect(rect.get_corners()[0].x == 0.0);
+    try t.expect(rect.get_corners()[0].y == 0.0);
+    try t.expect(rect.get_corners()[1].x == 10.0);
+    try t.expect(rect.get_corners()[1].y == 10.0);
+}
+
+test "RectF32 init via v" {
+    const rect: RectF32 = .{ .v = .{
+        .{ .x = 0.0, .y = 0.0 },
+        .{ .x = 10.0, .y = 10.0 },
+    } };
+
+    try t.expect(rect.v[0].x == 0.0);
+    try t.expect(rect.v[0].y == 0.0);
+    try t.expect(rect.v[1].x == 10.0);
+    try t.expect(rect.v[1].y == 10.0);
 }

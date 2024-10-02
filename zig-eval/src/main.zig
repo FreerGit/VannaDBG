@@ -1,7 +1,7 @@
 const std = @import("std");
-const VirtualArena = @import("base_arena.zig").VirtualArena;
-const Scratch = @import("base_arena.zig").Scratch;
-const base = @import("base_core.zig");
+const VirtualArena = @import("base/base_arena.zig").VirtualArena;
+const Scratch = @import("base/base_arena.zig").Scratch;
+const base = @import("base/base_core.zig");
 const render = @import("render/render.zig");
 const os = @import("os/os_gfx.zig");
 
@@ -41,9 +41,9 @@ pub fn main() !void {
 
     while (c.glfwWindowShouldClose(@ptrCast(window.handle)) == 0) {
         // Input
-        // if (c.glfwGetKey(window, c.GLFW_KEY_ESCAPE) == c.GLFW_PRESS) {
-        //     c.glfwSetWindowShouldClose(window, 1);
-        // }
+        if (c.glfwGetKey(window.handle, c.GLFW_KEY_ESCAPE) == c.GLFW_PRESS) {
+            c.glfwSetWindowShouldClose(window.handle, 1);
+        }
 
         // Rendering
         c.glClear(c.GL_COLOR_BUFFER_BIT);
