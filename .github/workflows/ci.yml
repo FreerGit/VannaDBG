@@ -35,6 +35,7 @@ jobs:
     - name: Run tests
       run:
         ./workflow.sh test
+
   build-zig:
     runs-on: ubuntu-latest
     steps:
@@ -48,8 +49,8 @@ jobs:
 
       - name: OpenGL, GLFW3 & elfutils (libdw)
         run: |
-          apt-get update -y
-          apt-get install -y libglfw3-dev elfutils libdw-dev libgl1-mesa-dev
+          sudo apt-get update -y
+          sudo apt-get install -y libglfw3-dev libgl1-mesa-dev
 
       - name: Build
         run: cd zig-eval && zig build
