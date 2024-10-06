@@ -278,23 +278,25 @@ test "doubly-linked push" {
 
 // Vectors
 
-pub const Vec2F32 = extern struct {
-    x: f32,
-    y: f32,
+pub fn Vec2(comptime T: type) type {
+    return extern struct {
+        x: T,
+        y: T,
 
-    pub fn new(x: f32, y: f32) Vec2F32 {
-        return .{ .x = x, .y = y };
-    }
-};
+        pub fn new(x: T, y: T) Vec2(T) {
+            return .{ .x = x, .y = y };
+        }
+    };
+}
 
-const RectF32 = extern union {
+pub const RectF32 = extern union {
     min_max: extern struct {
-        min: Vec2F32,
-        max: Vec2F32,
+        min: Vec2(f32),
+        max: Vec2(f32),
     },
-    v: [2]Vec2F32,
+    v: [2]Vec2(f32),
 
-    pub fn get_corners(self: *const RectF32) [2]Vec2F32 {
+    pub fn get_corners(self: *const RectF32) [2]Vec2(f32) {
         return self.v;
     }
 };
@@ -302,8 +304,8 @@ const RectF32 = extern union {
 test "RectF32 get_corners" {
     const rect: RectF32 = .{
         .min_max = .{
-            .min = Vec2F32.new(0.0, 0.0),
-            .max = Vec2F32.new(10.0, 10.0),
+            .min = Vec2(f32).new(0.0, 0.0),
+            .max = Vec2(f32).new(10.0, 10.0),
         },
     };
     try t.expect(rect.get_corners()[0].x == 0.0);

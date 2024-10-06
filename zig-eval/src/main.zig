@@ -13,7 +13,8 @@ const c = @cImport({
 pub fn main() !void {
     os.gfx_init();
 
-    const window = os.window_open(.{ .x = 800.0, .y = 600.0 });
+    const window = os.window_open(.{ .x = 800, .y = 600 });
+
     const r_handle = render.init();
 
     const vertices = [_]f32{
