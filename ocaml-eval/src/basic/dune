@@ -1,0 +1,7 @@
+(library
+ (name vanna)
+ (public_name vanna.basic)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane ppx_expect ppx_assert))
+ (libraries base))
